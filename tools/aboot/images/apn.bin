@@ -1,0 +1,548 @@
+{204, 04, "Vodafone NL", "live.vodafone.com", "0", "NONE", "vodafone", "vodafone"}
+{204, 08, "KPN/Hi 4G LTE Mobiel internet", "KPN4G.nl"}
+{204, 16, "T-Mobile Internet", "smartsites.t-mobile", "0", "PAP", "any", "any", "IPV4V6"}
+{208, 01, "Orange World", "orange", "0", "PAP", "orange", "orange"}
+{208, 09, "SFR webphone", "sl2sfr"}
+{208, 10, "SFR webphone", "sl2sfr", "0", "PAP", "any", "any"}
+{208, 10, "NRJWEB", "fnetnrj"}
+{208, 15, "Free", "free"}
+{208, 16, "Free", "free"}
+{208, 20, "Bouygues Telecom", "mmsbouygtel.com", "1500", "0", "PAP", "any", "any", "IPV6"}
+{208, 09, "Orange World", "orange", "0", "PAP", "telekom", "telekom"}
+{208, 500, "EDF", "internet"}
+{214, 01, "Internet m¨®vil", "airtelnet.es", "0", "PAP", "wap@wap", "wap125"}
+{214, 03, "Orange Internet M¨®vil", "orangeworld", "0", "PAP", "orange", "orange"}
+{214, 04, "Yoigo Internet", "internet"}
+{214, 07, "Movistar", "telefonica.es", "0", "PAP", "telefonica", "telefonica", "IPV4V6"}
+{222, 01, "WAP TIM", "wap.tim.it"}
+{222,	01,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{222, 10, "vodafone italy", "mobile.vodafone.it"}
+{222, 88, "INTERNET WIND", "internet.wind"}
+{226,	01,	"Vodafone Internet",	"LIVE.VODAFONE.COM",	"0",	"NONE",	"any",	"any"}
+{226,	01,	"Mobile Internet",	"internet.vodafone.ro",	"0",	"PAP",	"internet.vodafone.ro",	"vodafone"}
+{226,	03,	"Connect Mobile",	"broadband",	"0",	"NONE",	"any",	"any"}
+{226,	05,	"Digi Internet",	"internet",	"0",	"NONE",	"any",	"any"}
+{226,	10,	"Orange Internet",	"net",	"0",	"NONE",	"any",	"any"}
+{231, 03, "SWAN SK", "internet"}
+{231, 06, "O2-SK", "o2internet"}
+{234, 10, "O2 Mobile Web", "mobile.o2.co.uk", "0",	"PAP",	"o2",	"p",	"IPV4V6"}
+{234, 15, "Vodafone Contract Internet", "wap.vodafone.co.uk", "0",	"PAP",	"wap",	"wap"}
+{234, 30, "Internet", "everywhere", "0",	"PAP",	"eesecure",	"secure", "IPV4V6"}
+{234, 33, "Internet", "everywhere", "0",	"PAP",	"eesecure",	"secure", "IPV4V6"}
+{250, 01, "MTS Internet", "internet.mts.ru", "0", "PAP", "mts", "mts"}
+{250, 02, "MegaFon RUS", "internet"}
+{250, 20, "Tele2 Internet", "internet.tele2.ru"}
+{250, 99, "Beeline Internet", "internet.beeline.ru", "0", "PAP", "beeline", "beeline"}
+{260, 01, "Plus INTERNET", "plus"}
+{260, 02, "Internet", "internet", "0", "NONE", "any", "any", "IPV4V6"}
+{260, 03, "Orange INTERNET", "internetipv6", "0", "PAP", "internet", "internet", "IPV6"}
+{260, 06, "PLAY Internet", "internet", "0", "NONE", "any", "any", "IPV4V6"}
+{262, 01, "Telekom Internet", "internet.telekom", "0", "PAP", "telekom", "telekom", "IPV4V6"}
+{262, 02, "Vodafone Internet", "web.vodafone.de", "0", "NONE", "any", "any", "IPV4V6"}
+{262, 03, "O2 Internet", "internet", "0", "PAP", "any", "any", "IPV4V6"}
+{262, 07, "O2 Internet", "internet", "0", "NONE", "any", "any", "IPV4V6"}
+{268, 01, "Vodafone Net2", "net2.vodafone.pt", "0", "NONE", "any", "any", "IPV4V6"}
+{268, 01, "Vodafone Internet", "internet.vodafone.pt", "0", "NONE", "any", "any", "IPV4V6"}
+{268, 03, "Internet", "umts", "0", "NONE", "any", "any", "IPV4V6"}
+{268, 06, "Internet", "internet", "0", "NONE", "any", "any", "IPV4V6"}
+{310, 030, "AT&T Nextgenphone", "nxtgenphone", "0", "NONE", "any", "any", "IPV4V6"}
+{310, 160, "T-Mobile US 160 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 170, "AT&T Nextgenphone", "nxtgenphone", "0", "NONE", "any", "any", "IPV4V6"}
+{310, 200, "T-Mobile US 200 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 210, "T-Mobile US 210 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 220, "T-Mobile US 220 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 230, "T-Mobile US 230 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 240, "T-Mobile US 240 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 250, "T-Mobile US 250 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 260, "T-Mobile US 260 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 270, "T-Mobile US 270 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 310, "T-Mobile US 310 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 490, "T-Mobile US 490 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 530, "T-Mobile US 530 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 590, "T-Mobile US 590 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 640, "T-Mobile US 640 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 660, "T-Mobile US 640 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 800, "T-Mobile US 800 LTE", "fast.t-mobile.com", "0", "NONE", "any", "any", "IPV6"}
+{310, 280, "AT&T Nextgenphone", "nxtgenphone", "0", "NONE", "any", "any", "IPV4V6"}
+{310, 380, "AT&T Nextgenphone", "nxtgenphone", "0", "NONE", "any", "any", "IPV4V6"}
+{310, 410, "AT&T Nextgenphone", "nxtgenphone", "0", "NONE", "any", "any", "IPV4V6"}
+{310, 560, "AT&T Nextgenphone", "nxtgenphone", "0", "NONE", "any", "any", "IPV4V6"}
+{311, 180, "AT&T Nextgenphone", "nxtgenphone", "0", "NONE", "any", "any", "IPV4V6"}
+{330,	110, "CLARO Internet", "lte.claropr.com", "0", "NONE", "any", "any", "IPV4V6"}
+{334,	02, "Telcel Internet", "internet.itelcel.com", "0", "NONE", "webgprs", "webgprs"}
+{334,	03, "Movistar INTERNET", "internet.movistar.mx", "0", "PAP", "movistar", "movistar", "IPV4V6"}
+{334,	020, "Telcel EDGE", "internet.itelcel.com", "0", "NONE", "webgprs", "webgprs2002", "IPV4V6"}
+{334,	030, "MoviStar Internet", "internet.movistar.mx", "0", "NONE", "movistar", "movistar"}
+{334,	050, "web.attmex.mx", "web.attmex.mx", "0", "NONE", "any", "any", "IPV4V6"}
+{334,	070, "web.attmex.mx", "web.attmex.mx", "0", "NONE", "any", "any", "IPV4V6"}
+{334,	090, "web.attmex.mx", "web.attmex.mx", "0", "NONE", "any", "any", "IPV4V6"}
+{334,	140, "internet altan", "internet.altan", "0", "NONE", "any", "any", "IPV4V6"}
+{370,	01, "altice internet", "Altice", "0", "PAP", "any", "any"}
+{370,	02, "claro internet", "internet.ideasclaro.com.do", "0", "PAP", "any", "any"}
+{370,	04, "viva internet", "edge.viva.net.do", "0", "PAP", "viva", "viva"}
+{401,	01,	"Beeline",	"internet.beeline.kz",	"0",	"PAP",	"@internet.beeline",	"beeline"}
+{401,	02,	"Kcell",	"internet"}
+{401,	77,	"Tele2",	"internet"}
+{404,	01,	"Vodafone",	"www"}
+{404,	02,	"Airtel",	"airtelgprs.com"}
+{404,	03,	"Airtel",	"airtelgprs.com"}
+{404,	04,	"IDEA",	"internet"}
+{404,	05,	"Vodafone",	"www"}
+{404,	07,	"IDEA",	"internet"}
+{404,	09,	"Reliance",	"SMARTNET"}
+{404,	10,	"Airtel",	"airtelgprs.com"}
+{404,	11,	"Vodafone",	"www"}
+{404,	12,	"IDEA",	"internet"}
+{404,	13,	"Vodafone",	"www"}
+{404,	14,	"IDEA",	"internet"}
+{404,	15,	"Vodafone",	"www"}
+{404,	16,	"Airtel",	"airtelgprs.com"}
+{404,	17,	"AIRCEL",	"aircelwebpost"}
+{404,	18,	"Reliance",	"SMARTNET"}
+{404,	19,	"IDEA",	"internet"}
+{404,	20,	"Vodafone",	"www"}
+{404,	21,	"Loop Mobile",	"www"}
+{404,	22,	"IDEA",	"internet"}
+{404,	24,	"IDEA",	"internet"}
+{404,	25,	"AIRCEL",	"aircelwebpost"}
+{404,	27,	"Vodafone",	"www"}
+{404,	28,	"AIRCEL",	"aircelwebpost"}
+{404,	29,	"AIRCEL",	"aircelwebpost"}
+{404,	30,	"Vodafone",	"www"}
+{404,	31,	"Airtel",	"airtelgprs.com"}
+{404,	33,	"AIRCEL",	"aircelwebpost"}
+{404,	34,	"CellOne",	"bsnlnet"}
+{404,	35,	"AIRCEL",	"aircelwebpost"}
+{404,	36,	"Reliance",	"SMARTNET"}
+{404,	37,	"AIRCEL",	"aircelwebpost"}
+{404,	38,	"CellOne",	"bsnlnet"}
+{404,	40,	"Airtel",	"airtelgprs.com"}
+{404,	41,	"AIRCEL",	"aircelgprs.po"}
+{404,	43,	"Vodafone",	"www"}
+{404,	44,	"IDEA",	"internet"}
+{404,	45,	"Airtel",	"airtelgprs.com"}
+{404,	46,	"Vodafone",	"www"}
+{404,	49,	"Airtel",	"airtelgprs.com"}
+{404,	50,	"Reliance",	"SMARTNET"}
+{404,	51,	"CellOne",	"bsnlnet"}
+{404,	52,	"Reliance",	"SMARTNET"}
+{404,	53,	"CellOne",	"bsnlnet"}
+{404,	54,	"CellOne",	"bsnlnet"}
+{404,	55,	"CellOne",	"bsnlnet"}
+{404,	56,	"IDEA",	"internet"}
+{404,	57,	"CellOne",	"bsnlnet"}
+{404,	58,	"CellOne",	"bsnlnet"}
+{404,	59,	"CellOne",	"bsnlnet"}
+{404,	60,	"Vodafone",	"www"}
+{404,	62,	"CellOne",	"bsnlnet"}
+{404,	64,	"CellOne",	"bsnlnet"}
+{404,	66,	"CellOne",	"bsnlnet"}
+{404,	67,	"Reliance",	"SMARTNET"}
+{404,	68,	"Dolphin",	"gprsmtnldel",	"0",	"PAP",	"mtnl",	"mtnl123"}
+{404,	69,	"Dolphin",	"gprsmtnldel",	"0",	"PAP",	"mtnl",	"mtnl123"}
+{404,	70,	"Airtel",	"airtelgprs.com"}
+{404,	71,	"CellOne",	"bsnlnet"}
+{404,	72,	"CellOne",	"bsnlnet"}
+{404,	73,	"CellOne",	"bsnlnet"}
+{404,	74,	"CellOne",	"bsnlnet"}
+{404,	75,	"CellOne",	"bsnlnet"}
+{404,	76,	"CellOne",	"bsnlnet"}
+{404,	77,	"CellOne",	"bsnlnet"}
+{404,	78,	"IDEA",	"internet"}
+{404,	79,	"CellOne",	"bsnlnet"}
+{404,	80,	"CellOne",	"bsnlnet"}
+{404,	81,	"CellOne",	"bsnlnet"}
+{404,	82,	"IDEA",	"internet"}
+{404,	83,	"Reliance",	"SMARTNET"}
+{404,	84,	"Vodafone",	"www"}
+{404,	85,	"Reliance",	"SMARTNET"}
+{404,	86,	"Vodafone",	"www"} 
+{404,	87,	"IDEA",	"internet"}
+{404,	88,	"Vodafone",	"www"}
+{404,	89,	"IDEA",	"internet"}
+{404,	90,	"Airtel",	"airtelgprs.com"}
+{404,	91,	"AIRCEL",	"aircelwebpost"}
+{404,	92,	"Airtel",	"airtelgprs.com"}
+{404,	93,	"Airtel",	"airtelgprs.com"}
+{404,	94,	"Airtel",	"airtelgprs.com"}
+{404,	95,	"Airtel",	"airtelgprs.com"}
+{404,	96,	"Airtel",	"airtelgprs.com"}
+{404,	97,	"Airtel",	"airtelgprs.com"}
+{404,	98,	"Airtel",	"airtelgprs.com"}
+{405,	01,	"Reliance",	"rcomnet"}
+{405,	03,	"Reliance",	"rcomnet"}
+{405,	04,	"Reliance",	"rcomnet"}
+{405,	05,	"Reliance",	"rcomnet"}
+{405,	06,	"Reliance",	"rcomnet"}
+{405,	07,	"Reliance",	"rcomnet"}
+{405,	08,	"Reliance",	"rcomnet"}
+{405,	09,	"Reliance",	"rcomnet"}
+{405,	10,	"Reliance",	"rcomnet"}
+{405,	11,	"Reliance",	"rcomnet"}
+{405,	12,	"Reliance",	"rcomnet"}
+{405,	13,	"Reliance",	"rcomnet"}
+{405,	14,	"Reliance",	"rcomnet"}
+{405,	15,	"Reliance",	"rcomnet"}
+{405,	17,	"Reliance",	"rcomnet"}
+{405,	18,	"Reliance",	"rcomnet"}
+{405,	19,	"Reliance",	"rcomnet"}
+{405,	20,	"Reliance",	"rcomnet"}
+{405,	21,	"Reliance",	"rcomnet"}
+{405,	22,	"Reliance",	"rcomnet"}
+{405,	23,	"Reliance",	"rcomnet"}
+{405,	025,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	026,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	027,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	028,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	029,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	030,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	031,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	032,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	033,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	034,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405, 035,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	036,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	037,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	038,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	039,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	040,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	041,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	042,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	043,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	044,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	045,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	046,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	047,	"TataDOCOMO",	"TATA.DOCOMO.INTERNET"}
+{405,	51,	"Airtel",	"airtelgprs.com"}
+{405,	52,	"Airtel",	"airtelgprs.com"}
+{405,	53,	"Airtel",	"airtelgprs.com"}
+{405,	54,	"Airtel",	"airtelgprs.com"}
+{405,	55,	"Airtel",	"airtelgprs.com"}
+{405,	56,	"Airtel",	"airtelgprs.com"}
+{405,	66,	"Vodafone",	"www"} 
+{405,	67,	"Vodafone",	"www"} 
+{405,	70,	"IDEA",	"internet"}
+{405,	750,	"Vodafone",	"jkgprs"} 
+{405,	751,	"Vodafone",	"www"} 
+{405,	752,	"Vodafone",	"www"} 
+{405,	753,	"Vodafone",	"www"} 
+{405,	754,	"Vodafone",	"www"} 
+{405,	755,	"Vodafone",	"www"} 
+{405,	756,	"Vodafone",	"www"} 
+{405,	799,	"IDEA",	"internet"}
+{405,	800,	"AIRCEL",	"aircelgprs"}
+{405,	801,	"AIRCEL",	"aircelgprs"}
+{405,	802,	"AIRCEL",	"aircelgprs"}
+{405,	803,	"AIRCEL",	"aircelgprs"}
+{405,	804,	"AIRCEL",	"aircelgprs"}
+{405,	805,	"AIRCEL",	"aircelgprs"}
+{405,	806,	"AIRCEL",	"aircelgprs"}
+{405,	807,	"AIRCEL",	"aircelgprs"}
+{405,	808,	"AIRCEL",	"aircelgprs"}
+{405,	809,	"AIRCEL",	"aircelgprs"}
+{405,	810,	"AIRCEL",	"aircelgprs"}
+{405,	811,	"AIRCEL",	"aircelgprs"}
+{405,	812,	"AIRCEL",	"aircelgprs"}
+{405,	813,	"Uninor",	"uninor"}
+{405,	814,	"Uninor",	"uninor"}
+{405,	815,	"Uninor",	"uninor"}
+{405,	816,	"Uninor",	"uninor"}
+{405,	817,	"Uninor",	"uninor"}
+{405,	818,	"Uninor",	"uninor"}
+{405,	819,	"Uninor",	"uninor"}
+{405,	820,	"Uninor",	"uninor"}
+{405,	822,	"Uninor",	"uninor"}
+{405,	823,	"Videocon",	"vinternet.com"}
+{405,	824,	"Videocon",	"vinternet.com"}
+{405,	825,	"Videocon",	"vinternet.com"}
+{405,	826,	"Videocon",	"vinternet.com"}
+{405,	827,	"Videocon",	"vinternet.com"}
+{405,	828,	"Videocon",	"vinternet.com"}
+{405,	829,	"Videocon",	"vinternet.com"}
+{405,	830,	"Videocon",	"vinternet.com"}
+{405,	831,	"Videocon",	"vinternet.com"}
+{405,	832,	"Videocon",	"vinternet.com"}
+{405,	833,	"Videocon",	"vinternet.com"}
+{405,	834,	"Videocon",	"vinternet.com"}
+{405,	835,	"Videocon",	"vinternet.com"}
+{405,	836,	"Videocon",	"vinternet.com"}
+{405,	837,	"Videocon",	"vinternet.com"}
+{405,	838,	"Videocon",	"vinternet.com"}
+{405,	839,	"Videocon",	"vinternet.com"}
+{405,	840,	"jionet",	"jionet"}
+{405,	841,	"Videocon",	"vinternet.com"}
+{405,	842,	"Videocon",	"vinternet.com"}
+{405,	843,	"Videocon",	"vinternet.com"} 
+{405,	843,	"Videocon",	"vinternet.com"}
+{405,	844,	"Uninor",	"uninor"}
+{405,	845,	"IDEA",	"internet"}
+{405,	846,	"IDEA",	"internet"}
+{405,	847,	"IDEA",	"internet"}
+{405,	848,	"IDEA",	"internet"}
+{405,	849,	"IDEA",	"internet"}
+{405,	850,	"IDEA",	"internet"}
+{405,	851,	"IDEA",	"internet"}
+{405,	852,	"IDEA",	"internet"}
+{405,	853,	"IDEA",	"internet"}
+{405,	854,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	855,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	856,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	857,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	858,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	859,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	860,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	861,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	862,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	863,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	864,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	865,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	866,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	867,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	868,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	869,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	870,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	871,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	872,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	873,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	874,	"jionet",	"jionet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{405,	875,	"Uninor",	"uninor"}
+{405,	876,	"Uninor",	"uninor"}
+{405,	877,	"Uninor",	"uninor"}
+{405,	878,	"Uninor",	"uninor"}
+{405,	879,	"Uninor",	"uninor"}
+{405,	880,	"Uninor",	"uninor"}
+{405,	881,	"STEL",	"gprs.stel.in"}
+{405,	882,	"STEL",	"gprs.stel.in"}
+{405,	883,	"STEL",	"gprs.stel.in"}
+{405,	884,	"STEL",	"gprs.stel.in"}
+{405,	885,	"STEL",	"gprs.stel.in"}
+{405,	886,	"STEL",	"gprs.stel.in"}
+{405,	908,	"IDEA",	"internet"}
+{405,	909,	"IDEA",	"internet"}
+{405,	910,	"IDEA",	"internet"}
+{405,	911,	"IDEA",	"internet"}
+{405,	912,	"Cheers",	"internet"}
+{405,	913,	"Cheers",	"internet"}
+{405,	914,	"Cheers",	"internet"}
+{405,	915,	"Cheers",	"internet"}
+{405,	916,	"Cheers",	"internet"}
+{405,	917,	"Cheers",	"internet"}
+{405,	918,	"Cheers",	"internet"}
+{405,	919,	"Cheers",	"internet"}
+{405,	920,	"Cheers",	"internet"}
+{405,	921,	"Cheers",	"internet"}
+{405,	922,	"Cheers",	"internet"}
+{405,	923,	"Cheers",	"internet"}
+{405,	924,	"Cheers",	"internet"}
+{405,	925,	"Uninor",	"uninor"}
+{405,	926,	"Uninor",	"uninor"}
+{405,	927,	"Uninor",	"uninor"}
+{405,	928,	"Uninor",	"uninor"}
+{405,	929,	"Uninor",	"uninor"}
+{405,	930,	"Cheers",	"internet"}
+{405,	931,	"Cheers",	"internet"}
+{405,	932,	"Videocon",	"vinternet.com"} 
+{410,	01,	"Mobilink",	"connect.mobilinkworld.com",	"0",	"PAP",	"Mobilink",	"Mobilink"} 
+{410,	03,	"Ufone",	"Ufone.internet"} 
+{410,	04,	"ZONG",	"zonginternet"}
+{410,	06,	"Telenor",	"internet"}
+{410,	07,	"Warid",	"Wap.warid"}
+{414,	01,	"MPTNET","mptnet"}
+{414,	03,	"MECTEL EVDO","#777","0","PAP/CHAP","card","card"}
+{414,	04,	"MPTNET","#777","0","PAP/CHAP","mpt@c800.mm","123"}
+{414,	05,	"Ooredoo Internet","internet"}
+{414,	06,	"Telenor","internet"}
+{414,	09,	"Mytel Internet","mytel","0","NONE","any","any","IPV4V6"}
+{415,	01,	"Alfa",	"internet.mic1.com.lb",	"0",	"PAP",	"mic1",	"mic1"}
+{415,	03,	"MTC",	"gprs.mtctouch.com.lb"}
+{416,	01,	"Zain JO",	"internet",	"0",	"PAP",	"zain",	"zain"}
+{416,	03,	"umniah",	"internet"}
+{416,	77,	"Orange",	"net.orange.jo",	"0",	"PAP",	"net",	"net"}
+{418,	66,	"Fastlink",	"fastlink"}
+{419,	02,	"ZAIN",	"pps",	"0",	"PAP",	"pps",	"pps"}
+{419,	03,	"WATANIYA",	"action.wataniya.com"}
+{419,	04,	"VIVA",	"VIVA"}
+{420,	01,	"JAWALNet",	"jawalnet.com.sa"}
+{420,	03,	"mobily",	"web2"}
+{420,	04,	"zain",	"zain"}
+{422,	02,	"Oman",	"taif"}
+{422,	02,	"Nawras",	"isp.nawras.com.om",	"0",	"PAP",	"taif",	"taif"}
+{424,	02,	"DATA",	"etisalat.ae"}
+{424,	03,	"Du",	"du"}
+{425,	01,	"Partner", "uinternet"}
+{425,	01,	"Internet 3G", "modem.orange.net.il"}
+{425,	02,	"Cellcom", "Sphone"}
+{425,	03,	"Sphone Pelephone",	"sphone.pelephone.net.il",	"0",	"PAP",	"pcl@3g",	"pcl"}
+{425,	05,	"Jawwal WAP", "wap"}
+{425,	06,	"Internet", "internet"}
+{425,	07,	"Internet HOT mobile", "net.hotm"}
+{425,	08,	"GolanTelecom Internet", "internet.golantelecom.net.il"}
+{425,	14,	"Alon Internet", "data.youphone.co.il"}
+{425,	15,	"Home Cellular Internet", "hcminternet"}
+{425,	16,	"Rami Levi 3G", "internet.rl"}
+{426,	01,	"Batelco",	"internet.batelco.com"}
+{426,	02,	"Zain",	"connect.mobilinkworld.com",	"0",	"PAP",	"Mobilink",	"Mobilink"}
+{426,	04,	"Viva",	"viva.bh"}
+{427,	01,	"Qtel",	"gprs.qtel",	"0",	"PAP",	"gprs",	"gprs"}
+{427,	02,	"Vodafone",	"web.vodafone.com.qa"}
+{440,	10,	"NTT",	"spmode.ne.jp"}
+{440,	10,	"NTT",	"mpr2.bizho.net"}
+{440,	10,	"NTT",	"0120.mopera.net"}
+{450,	05,	"SK Telecom",	"web.sktelecom.com"}
+{450,	05,	"SK Telecom",	"lte.sktelecom.com",	"2"}
+{450,	08,	"KT",	"lte.ktfwing.com","2"}
+{450,	08,	"KT",	"alwayson.ktfwing.com"}
+{450,	02,	"KT",	"lte.ktfwing.com",	"2"}
+{450,	02,	"KT",	"alwayson.ktfwing.com"}
+{450,	06,	"LG U+",	"internet.lguplus.co.kr"}
+{452,	01,	"MOBIFONE", "m-wap", "0",	"PAP", "mms", "mms"}
+{452,	02,	"Vinaphone", "m3-world"}
+{452,	04,	"Viettelmobile",	"v-internet"}
+{452,	05,	"Vietnamobile",	"internet"}
+{452,	07,	"BEELINE", "internet"}
+{452,	08,	"EVNTelecom Email",	"e-internet"}
+{454,	00,	"CSL Data",	"hkcsl"}
+{454,	02,	"CSL Data",	"hkcsl"}
+{454,	03,	"Hutchison",	"mobile.three.com.hk"}
+{454,	04,	"Hutchison",	"web-g.three.com.hk"}
+{454,	06,	"SmarTone",	"SmarTone"}
+{454,	10,	"CSL",	"hkcsl"}
+{454,	12,	"CMHK",	"peoples.net"}
+{454,	14,	"Hutchison",	"web-g.three.com.hk"}
+{454,	15,	"SmarTone",	"SmarTone"}
+{454,	16,	"PCCW",	"pccwdata"}
+{454,	17,	"SmarTone",	"SmarTone"}
+{454,	18,	"CSL",	"hkcsl"}
+{454,	19,	"PCCW",	"pccw"}
+{455,	00,	"SmarTone",	"smartgprs"}
+{455,	01,	"CTM",	"ctm-mobile"}
+{455,	03,	"Hutchinson ",	"web-g.three.com.hk",	"0",	"PAP",	"hutchison",	"1234"}
+{455,	04,	"CTM",	"ctm-mobile"}
+{456,	01,	"Cellcard", "cellcard", "0", "PAP", "mobitel", "mobitel", "IPV4"}
+{456,	02,	"Smart", "default"}
+{456,	04,	"QB", "wap"}
+{456,	05,	"Stat-Cell", "default"}
+{456,	06,	"Smart", "smart"}
+{456,	08,	"Metfone", "metfone"}
+{456,	09,	"Beeline", "default"}
+{456,	11,	"Seatel", "seatel"}
+{456,	18,	"Cellcard", "default"}
+{457,	01,	"Lte4g", "lte4g"}
+{457,	02,	"Etlnet", "etlnet"}
+{457,	03,	"Unitel3g", "unitel3g"}
+{457,	08,	"Beeline", "beelinelaonet"}
+{460,	00,	"CMCC",	"cmnet",	"1400", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	01,	"CUCC",	"3gnet",	"1250", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	02,	"CMCC",	"cmnet",	"1400", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	03,	"CTCC",	"ctnet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	04,	"CMCC",	"cmiot",	"1400", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	04,	"CMCC",	"cmnet",	"1400", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	05,	"CTCC",	"ctnet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	06,	"CUCC",	"3gnet",	"1250", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	07,	"CMCC",	"cmnet",	"1400", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	08,	"CMCC",	"cmnet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	09,	"CUCC",	"3gnet",	"1250", "0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	11,	"CTCC",	"ctnet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{460,	15,	"CBN",	"cbnet",	"0",	"NONE",	"any",	"any",	"IPV4V6"}
+{466,	01,	"Far EasTone",	"internet"}
+{466,	05,	"APT",	"gtnet"}
+{466,	88,	"KGT",	"internet"}
+{466,	89,	"VIBO",	"vibo"}
+{466,	89,	"VIBOONE",	"viboone"}
+{466,	92,	"CHT",	"internet"}
+{466,	93,	"TWM",	"internet"}
+{466,	97,	"TWM",	"internet"}
+{466,	99,	"TWM",	"internet"}
+{466,	99,	"TWM match",	"twm"}
+{470,	01,	"Grameenphone",	"gpinternet"}
+{470,	01,	"Grameenphone",	"gpinterneth"}
+{470,	02,	"Robi axiata",	"internet"}
+{470,	03,	"Banglalink",	"blweb"}
+{470,	04,	"Teletalk",	"wap"}
+{470,	07,	"Airtel-BGD",	"internet"}
+{502, 12, "Maxis Internet", "unet", "0", "PAP", "maxis", "wap",	"IPV4V6"}
+{502, 13, "Celcom", "unet", "0", "NONE", "any", "any", "IPV4V6"}
+{502, 16, "Digi", "diginet", "0", "NONE", "digi", "digi", "IPV4V6"}
+{502, 18, "U Mobile Internet", "my3g", "0", "NONE", "any", "any", "IPV4V6"}
+{502, 19, "Celcom Internet", "celcom3g", "0", "NONE", "any", "any", "IPV4V6"}
+{502, 152, "Yes Internet", "yesnet", "0", "NONE", "any", "any", "IPV4V6"}
+{502, 153, "unifi", "unifi", "0", "NONE", "any", "any", "IPV4V6"}
+{510, 01, "ISAT WAP", "indosatgprs"}
+{510, 08, "AXIS GPRS", "AXIS"}
+{510, 09, "Smartfren4G", "Smartfren4G", "0", "NONE", "any", "any", "IPV4V6"}
+{510, 10, "Telkomsel GPRS WEB", "internet"}
+{510, 10, "Telkomsel GPRS", "telkomsel"}
+{510, 11, "internet", "internet"}
+{510, 21, "ISAT M3 INTERNET", "indosatgprs"}
+{510, 28, "Smartfren4G", "Smartfren4G", "0", "NONE", "any", "any", "IPV4V6"}
+{510, 68, "Internux", "internet"}
+{510, 78, "hinet4G", "internet"}
+{510, 88, "Internux", "internet"}
+{510, 89, "3 GPRS", "3gprs"}
+{510, 99, "AHA", "#777"}
+{514, 01, "Telin", "default"}
+{514, 02, "Timor Telecom", "default"}
+{514, 03, "Viettel Timor-Leste", "default"}
+{515, 02, "myGlobe Internet Postpaid", "internet.globe.com.ph"}
+{515, 02, "myGlobe Internet Prepaid", "http.globe.com.ph"}
+{515, 03, "Smart Internet",	"internet"}
+{515, 03, "Smart LTE", "smartbro"}
+{515, 03, "Smart LTE", "smartlte", "2"}
+{515, 05, "SUN INTERNET", "minternet"}
+{515, 05, "SUN INTERNET", "minternet"}
+{515, 18, "RED INTERNET", "redinternet"}
+{515, 18, "SUN WAP GPRS", "redmms"}
+{515, 66, "DITO", "internet.dito.ph", "0", "NONE", "true", "true", "IPV4V6"}
+{520, 00, "TrueMove-H",	"hinternet", "0", "NONE", "true", "true"}
+{520, 01, "AIS GPRS Internet",	"internet",	"0",	"NONE",	"ais",	"ais"}
+{520, 03, "AIS Internet",	"internet"}
+{520, 04, "TRUE-H Internet", "internet", "0", "NONE", "true", "true", "IPV4V6"}
+{520, 05, "DTAC Internet", "www.dtac.co.th"}
+{520, 10, "TRUE GPRS", "internet", "0", "NONE", "true", "true"}
+{520, 15, "TOT Internet", "internet"}
+{520, 18, "DTAC GPRS", "www.dtac.co.th"}
+{520, 23, "AIS GPRS", "internet"}
+{520, 47, "TOT Internet", "internet"}
+{520, 99, "TRUE GPRS", "internet", "0", "NONE", "true", "true"}
+{525, 01, "Singtel (Postpaid)", "e-ideas"}
+{525, 01, "Singtel (Prepaid)", "hicard"}
+{525, 02, "Singtel (Postpaid)", "e-ideas"}
+{525, 02, "Singtel (Prepaid)", "hicard"}
+{525, 03, "M1", "sunsurf"}
+{525, 04, "M1", "sunsurf"}
+{525, 05, "SH Data Postpaid", "shwap"}
+{525, 05, "SH Data Prepaid", "shppd"}
+{525, 05, "GT Roaming", "gtnet"}
+{525, 05, "giga", "giga"}
+{525, 10, "TPG", "TPG"}
+{525, 02, "B-Mobile Internet", "bmobilewap"}
+{525, 11, "DST Internet", "dst.internet"}
+{704, 02, "Internet Tigo", "broadband.tigo.gt", "0", "PAP", "any", "any"}
+{706, 01, "Internet CLARO", "internet.ideasclaro"}
+{706, 03, "Internet Tigo", "internet.tigo.sv", "0", "PAP", "any", "any"}
+{706, 04, "Movistar INTERNET", "internet.movistar.sv", "0", "PAP", "movistarsv", "movistarsv", "IPV4V6"}
+{706, 04, "Movistar WAP", "wap.movistar.sv", "0", "NONE", "movistarsv", "movistarsv", "IPV4V6"}
+{706, 040, "Movistar INTERNET", "internet.movistar.sv", "0", "PAP", "movistarsv", "movistarsv"}
+{708, 00, "Internet Claro", "internet.ideasclaro"}
+{708, 001, "Internet Claro", "internet.ideasclaro"}
+{708, 02, "INTERNET TIGO", "internet.tigo.hn", "0", "PAP", "any", "any"}
+{708, 04, "Honduras:Digicel:Internet", "web.digicelhn.com"}
+{708, 020, "INTERNET TIGO", "internet.tigo.hn"}
+{708, 040, "Honduras:Digicel:Internet:2", "web.digicelhn.com"£¬"0", "PAP", "any", "any"}
+{710, 300, "Tigo NI", "internet.tigo.ni", "0", "PAP", "tigoni", "tigoni"}
+{716, 06, "Movistar INTERNET", "movistar.pe", "0", "PAP", "movistar@datos", "movistar", "IPV4V6"}
+{716, 06, "Movistar WAP", "wap.movistar.pe", "0", "PAP", "movistar@datos", "movistar"}
+{716, 10, "CLARO DATOS", "claro.pe", "0", "PAP", "claro", "claro"}
+{716, 15, "Bitel Internet", "bitel.pe", "0", "PAP", "any", "any"}
+{716, 17, "Entel PE", "entel.pe"}
+{730, 01, "Entel Chile", "bam.entelpcs.cl", "0", "PAP", "any", "any"}
+{730, 02, "Movistar Internet", "wap.tmovil.cl", "0", "PAP", "wap", "wap"}
+{730, 03, "Claro Chile", "bam.clarochile.cl", "0", "PAP", "wap", "wap"}
+{730, 09, "Internet WOM", "internet"}
+{732, 12, "Movistar INTERNET", "internet.movistar.com.co", "0", "PAP", "movistar", "movistar"}
+{732, 101, "Colombia:Comcel", "internet.comcel.com.co", "0", "PAP", "COMCELWEB", "COMCELWEB", "IPV4V6"}
+{732, 103, "TIGO Web", "web.colombiamovil.com.co"}
+{732, 111, "TIGO Web", "web.colombiamovil.com.co"}
+{732, 123, "Movistar INTERNET", "internet.movistar.com.co", "0", "PAP", "movistar", "movistar"}
+{732, 130, "Avantel", "lte.avantel.com.co"}
+{732, 360, "WOM Internet", "internet.wom.co", "0", "PAP", "any", "any", "IPV4V6"}
