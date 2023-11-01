@@ -1,60 +1,23 @@
 #include "app.h"
+#include "drv_uart.h"
+#include "drv_virt_at.h"
 
-/* 互斥锁 */
-osMutexId_t TASK_MT = NULL;
-/* 信号量 */
-osSemaphoreId_t TASK_ST = NULL;
-/* 定时器 */
-osTimerId_t TASK_TT = NULL;
+#define DBG_NAME "app"
 
-void task1(void *argument)
+void dbg_th(void* argument)
 {
-    osStatus_t resM;
-    while (1)
-    {
-        resM = osMutexAcquire(TASK_MT,1000);
-        if(resM == osOK){
-            osDelayMs(100);
-            u0_printf("task1 runing1\r\n");
-            osMutexRelease(TASK_MT);
-        }
-        u0_printf("Task1 TASK_MT Timeout\r\n");
-        // osDelayMs(1000);
-    }
-}
-
-void task2(void *argument)
-{
-    osStatus_t resM;
-    while (1)
-    {
-        resM = osMutexAcquire(TASK_MT,1000);
-        if(resM == osOK){
-            u0_printf("task2 runing>>>>>>>>>>>>>>\r\n");
-            osDelayMs(1000);
-            u0_printf("task2 runing..............\r\n");
-            osMutexRelease(TASK_MT);
-            osSemaphoreRelease(TASK_ST);
-        }
-        u0_printf("Task2 TASK_MT Timeout\r\n");
-    }
+    /*串口由于LOG功能,已在cm_opencpu_entry()开头初始化*/
+    int readLen = 0 ;
+    /* 创建信号量 */
+	u0_uart_sem = osSemaphoreNew(1, 0, NULL);
+    DBG_F("hmi_uart_sem ID: %d\r\n", u0_uart_sem);
     
-}
-
-void task3(void *argument)
-{
-    osStatus_t resS;
     while(1){
-        resS = osSemaphoreAcquire(TASK_ST,1000);
-        if(resS == osOK){
-            u0_printf("task3 runing\r\n");
-        }
+        osSemaphoreAcquire(u0_uart_sem, osWaitForever);
+        readLen = u0_uart_read(rxBuff);
+        my_virt_at_test((unsigned char*)rxBuff, strlen(rxBuff));
+        u0_printf("Send %s (%d)\r\n",rxBuff , readLen);
     }
-}
-
-void time1_callback(void *param)
-{
-
 }
 
 osThreadId_t osThreadCreat(const char * name,osThreadFunc_t func,osPriority_t priority,uint32_t stacksize)

@@ -1,14 +1,21 @@
-#include "uart.h"
+#include "includes.h"
+#include "drv_uart.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "app.h"
+
+static char txBuff0[256];
+char rxBuff[256];
+unsigned log_num = 0;
 
 void u0_callback(void *param, uint32_t type)
 {
-    
+
 	if(CM_UART_EVENT_TYPE_RX_ARRIVED & type){
     /* 接收到新的数据  */
-        
+        osSemaphoreRelease(u0_uart_sem);
+
     }else if(CM_UART_EVENT_TYPE_RX_OVERFLOW & type){
     /* 接收FIFO缓存溢出 */
     
@@ -30,7 +37,7 @@ void uart_open(cm_uart_dev_e dev,int baudrate,void* callback)
     {
         CM_UART_EVENT_TYPE_RX_ARRIVED|CM_UART_EVENT_TYPE_RX_OVERFLOW,
         "NULL",
-        u0_callback
+        callback
     };
 
     if(dev == CM_UART_DEV_0){
@@ -60,7 +67,6 @@ void uart_open(cm_uart_dev_e dev,int baudrate,void* callback)
 
 void u0_printf(char *str, ...)
 {
-    static char s[600]; //This needs to be large enough to store the string TODO Change magic number
     va_list args;
     int len;
     
@@ -70,7 +76,17 @@ void u0_printf(char *str, ...)
     }
 
     va_start (args,str);
-    len = vsnprintf((char*)s,600,str,args);
+    len = vsnprintf((char*)txBuff0,256,str,args);
     va_end(args);
-    cm_uart_write(CM_UART_DEV_0,s,len,1000);
+    cm_uart_write(CM_UART_DEV_0,txBuff0,len,1000);
 }
+
+int u0_uart_read(char* data)
+{
+    int ret = EOF;
+    memset(data, 0, strlen(data));
+    ret = cm_uart_read(CM_UART_DEV_0, (void*)data, 256, 1000);
+    return ret;
+}
+
+

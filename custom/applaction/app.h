@@ -2,7 +2,7 @@
 #define __APP_H
 
 #include "includes.h"
-#include "uart.h"
+#include "drv_uart.h"
 
 #define FlagSET(Flag,bit)	(Flag |= (bit))		//Flag置位
 #define FlagCLR(Flag,bit)	(Flag &= ~(bit))	//Flag清位
@@ -11,7 +11,7 @@
 /* 互斥量 */
 extern osMutexId_t TASK_MT;
 /* 信号量 */
-extern osSemaphoreId_t TASK_ST;
+extern osSemaphoreId_t u0_uart_sem;
 /* 定时器 */
 osTimerId_t TASK_TT;
 
@@ -44,31 +44,10 @@ osTimerId_t osTimerCreat(const char * name,osTimerFunc_t func,osTimerType_t type
 void osDelayMs(uint32_t ms);
 
 /**
- * @brief 进程1
+ * @brief AT 测试进程
  * 
  * @param argument 
  */
-void task1(void *argument);
-
-/**
- * @brief 进程2
- * 
- * @param argument 
- */
-void task2(void *argument);
-
-/**
- * @brief 进程3
- * 
- * @param argument 
- */
-void task3(void *argument);
-
-/**
- * @brief 定时器1
- * 
- * @param argument 
- */
-void time1_callback(void *param);
+void dbg_th(void* argument);
 
 #endif // !__APP_H
