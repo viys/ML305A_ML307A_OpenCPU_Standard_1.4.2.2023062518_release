@@ -6,6 +6,7 @@
 
 #define DEBUG //开启DBG
 #define COLR_LOG_MODE //颜色日志输出模式
+// #define DBG_NAME "untarck"
 extern unsigned log_num;
 extern char rxBuff[256];
 
@@ -26,7 +27,6 @@ z:特殊效果
 /*
  *  I:INFO W:WARN E:ERR F:FLAG
  */
-
 #ifdef DEBUG
     #define DBG_I(str,...) {COLR_SET(34,34,1);DBG_UART("[%05d] I/%s: ",log_num++,DBG_NAME);DBG_UART(str,##__VA_ARGS__);COLR_SET(0,0,0);}
     #define DBG_W(str,...) {COLR_SET(33,33,1);DBG_UART("[%05d] W/%s: ",log_num++,DBG_NAME);DBG_UART(str,##__VA_ARGS__);COLR_SET(0,0,0);}

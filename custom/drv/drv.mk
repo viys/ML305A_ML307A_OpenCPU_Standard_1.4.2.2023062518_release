@@ -7,3 +7,8 @@ INC      += -I'$(DRV_UART_DIR)/uart'
 
 #lw_oopc
 INC      += -I'$(DRV_UART_DIR)/lw_oopc'
+
+#volte
+OC_FILES +=  $(DRV_UART_DIR)/volte/hal_call.c
+OC_FILES +=  $(DRV_UART_DIR)/volte/hal_modem.c
+INC      += -I'$(DRV_UART_DIR)/volte'
