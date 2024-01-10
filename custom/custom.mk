@@ -10,4 +10,5 @@ INC      += -I'$(APPLACTION_DIR)'
 
 ifeq ($(strip $(DEMO_SUPPORT)),n)
 include $(CUSTOM_DIR)/drv/drv.mk
+include $(CUSTOM_DIR)/bsp/bsp.mk
 endif

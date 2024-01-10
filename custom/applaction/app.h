@@ -8,10 +8,18 @@
 #define FlagCLR(Flag,bit)	(Flag &= ~(bit))	//Flag清位
 #define FlagGET(Flag,bit)	(Flag & (bit))		//Flag获取
 
+
+
 /* 互斥量 */
 extern osMutexId_t TASK_MT;
 /* 信号量 */
 extern osSemaphoreId_t u0_uart_sem;
+extern osSemaphoreId_t button_sem;
+
+extern osMessageQueueId_t button_click_queue;
+extern osMessageQueueId_t transceiver_queue;
+extern osMessageQueueId_t socket_send_queue;
+
 /* 定时器 */
 osTimerId_t TASK_TT;
 
@@ -49,5 +57,26 @@ void osDelayMs(uint32_t ms);
  * @param argument 
  */
 void dbg_th(void* argument);
+
+/**
+ * @brief 按键点击线程
+ * 
+ * @param param 
+ */
+void Button_Click_Thread(void* param);
+
+/**
+ * @brief 通话器操作线程
+ * 
+ * @param param 
+ */
+void Transceiver_Thread(void* param);
+
+/**
+ * @brief socket客户端操作线程
+ * 
+ * @param param 
+ */
+void Socket_Client_Thread(void* param);
 
 #endif // !__APP_H
