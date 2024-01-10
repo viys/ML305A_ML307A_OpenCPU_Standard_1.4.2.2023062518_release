@@ -14,8 +14,8 @@ int socket_init(void* t, SocketInfo socket)
 
     memcpy(&this->info, &socket, sizeof(SocketInfo));
     
-    // my_tcp_init(&this->socket, (const char*)this->info.addr, this->info.port, this->info.callback);
-    ret = my_tcp_init();
+    ret = my_tcp_init(&this->socket, (const char*)this->info.addr, this->info.port, this->info.callback);
+    // ret = my_tcp_init();
     return ret;
 }
 

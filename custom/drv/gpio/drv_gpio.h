@@ -17,17 +17,17 @@
 #include "cm_iomux.h"
 
 /*网络指示相关宏定义*/
-#define BUTTON_NUM CM_GPIO_NUM_13
-#define BUTTON_PIN CM_IOMUX_PIN_77
+#define BUTTON_NUM      CM_GPIO_NUM_13
+#define BUTTON_PIN      CM_IOMUX_PIN_77
 
-#define AUDIO_NUM CM_GPIO_NUM_4
-#define AUDIO_PIN CM_IOMUX_PIN_51
+#define AUDIO_NUM       CM_GPIO_NUM_4
+#define AUDIO_PIN       CM_IOMUX_PIN_51
 
-#define NETWORK
-#define NETWORK_PIN
+#define RUN_NUM         CM_GPIO_NUM_1
+#define RUN_PIN         CM_IOMUX_PIN_25
 
-#define RUN_NUM
-#define RUN_PIN
+#define NETWORK_NUM     CM_GPIO_NUM_0
+#define NETWORK_PIN     CM_IOMUX_PIN_16
    
 /*呼叫消息队列优先级*/
 #define MY_CALL_PRIO 4
@@ -103,5 +103,11 @@ int my_gpio_init(cm_gpio_num_e gpio_num, cm_iomux_pin_e gpio_pin,cm_gpio_cfg_t c
 int my_audio_io_init(void);
 
 int my_audio_io_sw(uint8_t level);
+
+int my_run_io_init(void);
+int my_run_io_sw(uint8_t level);
+
+int my_network_io_init(void);
+int my_network_io_sw(uint8_t level);
 
 #endif // !__DRV_GPIO_H

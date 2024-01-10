@@ -139,9 +139,85 @@ void Transceiver_Thread(void* param)
     
 }
 
+char recv_buf[324+8];
 void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
 {
+    switch (event)
+    {
+    // responses
+    case CM_ASOCKET_EV_CONNECT_OK: {
+        /*直接赋值为1清除其他位*/
+        // MySocket_CB.status = 1;
+        DBG_I("sock(%d) connect_ok\r\n", sock);
+        break;
+    }
+    case CM_ASOCKET_EV_CONNECT_FAIL: {
+        DBG_I("sock(%d) connect_fail\r\n", sock);
+        break;
+    }
 
+    // indications
+    case CM_ASOCKET_EV_RECV_IND: {
+        /* 取得获取接收缓存中可读的数据长度 */
+        int recv_avail = 0;
+        cm_asocket_ioctl(SocketClient->socket, FIONREAD, &recv_avail);
+
+        /* 接收数据 */
+        memset(recv_buf, 0, 324+8);
+        int ret = cm_asocket_recv(SocketClient->socket, recv_buf, sizeof(recv_buf), 0);
+        if (ret > 0){
+            // my_socket_recv_handle(recv_buf);
+            // DBG_I("sock(%d) recv_ind: recv_avail=%d, recv_len=%d, data=%x %x %x %x %x %x %x %x %x\r\n"
+            //         , MyTCP_CB.sock, recv_avail, ret,
+            //         recv_buf[0],recv_buf[1],recv_buf[2],recv_buf[3],recv_buf[4],recv_buf[5],recv_buf[6],recv_buf[7],recv_buf[8]);
+        }
+        else
+        {
+            DBG_I("sock(%d) recv_ind error(%d)\r\n", SocketClient->socket, errno);
+
+            if (ENOTCONN == errno)
+            {
+                /* Connection closed */
+                /*全部状态清空*/
+                // MySocket_CB.status = 0;
+                // my_netled_status_sw(0);
+                DBG_I("sock(%d) recv_ind: Connection closed\r\n", MyTCP_CB.sock);
+            }
+        }
+        break;
+    }
+    case CM_ASOCKET_EV_SEND_IND:
+        // DBG_I("sock(%d) send_ind\r\n", MyTCP_CB.sock);
+        break;
+    case CM_ASOCKET_EV_ACCEPT_IND:
+        // DBG_I("sock(%d) accept_ind\r\n", MyTCP_CB.sock);
+        break;
+    case CM_ASOCKET_EV_ERROR_IND: {
+        /* 获取socket错误码 */
+        int sock_error = 0;
+        socklen_t opt_len = sizeof(sock_error);
+        cm_asocket_getsockopt(SocketClient->socket, SOL_SOCKET, SO_ERROR, &sock_error, &opt_len);
+        DBG_I("sock(%d) error_ind: sock_error(%d)\r\n", SocketClient->socket, sock_error);
+        if (ECONNABORTED == sock_error)
+        {
+            /* Connection aborted */
+            DBG_I("sock(%d) error_ind: Connection aborted\r\n", SocketClient->socket);
+        }
+        else if (ECONNRESET == sock_error)
+        {
+            /* Connection reset */
+            DBG_I("sock(%d) error_ind: Connection reset\r\n", SocketClient->socket);
+        }
+        else if (ENOTCONN == sock_error)
+        {
+            /* Connection closed */
+            DBG_I("sock(%d) error_ind: Connection closed\r\n", SocketClient->socket);
+        }
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void Socket_Client_Thread(void* param)
@@ -157,6 +233,9 @@ void Socket_Client_Thread(void* param)
     my_device_par();
 
     SocketClient = SOCKETSERVER_CTOR();
+
+    my_network_io_init();
+    my_network_io_sw(1);
 
     // while(SocketClient->init(SocketClient, info) != 0){
     //     osDelayMs(1000);

@@ -36,7 +36,6 @@ int cm_opencpu_entry(char *param)
 
 	/* 创建Transceiver进程 */
 	osThreadCreat("click", Socket_Client_Thread, 5, 1024);
-	
 
 	return 0;
 }

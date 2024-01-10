@@ -186,3 +186,49 @@ int my_audio_io_sw(uint8_t level)
     return ret;
 }
 
+int my_run_io_init(void)
+{
+    int ret = EOF;
+    cm_gpio_cfg_t cfg ={
+        
+        .direction = CM_GPIO_DIRECTION_OUTPUT,
+        .pull = CM_GPIO_PULL_DOWN
+    };
+    
+    cm_iomux_set_pin_func(RUN_PIN, CM_IOMUX_FUNC_FUNCTION1);
+    ret += cm_gpio_deinit(RUN_NUM);
+    ret += cm_gpio_init(RUN_NUM, &cfg);
+
+    return ret;
+}
+
+int my_run_io_sw(uint8_t level)
+{
+    int ret = EOF;
+    ret = cm_gpio_set_level(RUN_NUM, level);
+    return ret;
+}
+
+int my_network_io_init(void)
+{
+    int ret = EOF;
+    cm_gpio_cfg_t cfg ={
+        
+        .direction = CM_GPIO_DIRECTION_OUTPUT,
+        .pull = CM_GPIO_PULL_DOWN
+    };
+    
+    cm_iomux_set_pin_func(NETWORK_PIN, CM_IOMUX_FUNC_FUNCTION1);
+    ret += cm_gpio_deinit(NETWORK_NUM);
+    ret += cm_gpio_init(NETWORK_NUM, &cfg);
+
+    return ret;
+}
+
+int my_network_io_sw(uint8_t level)
+{
+    int ret = EOF;
+    ret = cm_gpio_set_level(NETWORK_NUM, level);
+    return ret;
+}
+

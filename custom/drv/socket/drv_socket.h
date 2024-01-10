@@ -73,7 +73,8 @@ int my_socket_send(int sockect, const void *dataptr, size_t size);
  */
 int my_socket_reconnect(void);
 
-// int my_tcp_init(int* socket, const char* addr, uint16_t port, void* socket_callback);
-int my_tcp_init(void);
-
+int my_tcp_init(int* socket, const char* addr, uint16_t port, void* socket_callback);
+// int my_tcp_init(void);
+// int my_tcp_init1(void);
+void __on_asocket_event(int sock, cm_asocket_event_e event, void *user_param);
 #endif // !__DRV__SOCKET_H
