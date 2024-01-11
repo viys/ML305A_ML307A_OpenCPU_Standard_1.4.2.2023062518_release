@@ -14,6 +14,9 @@ OC_FILES +=  $(DRV_UART_DIR)/display.c
 #socket_client
 OC_FILES +=  $(DRV_UART_DIR)/socket_client.c
 
+#battery
+OC_FILES +=  $(DRV_UART_DIR)/battery.c
+
 #bsp_dial
 # OC_FILES +=  $(DRV_UART_DIR)/bsp_dial.c
 

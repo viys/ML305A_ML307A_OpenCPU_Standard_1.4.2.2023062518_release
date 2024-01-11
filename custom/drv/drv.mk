@@ -16,6 +16,10 @@ INC      += -I'$(DRV_UART_DIR)/gpio'
 OC_FILES +=  $(DRV_UART_DIR)/socket/drv_socket.c
 INC      += -I'$(DRV_UART_DIR)/socket'
 
+#adc
+OC_FILES +=  $(DRV_UART_DIR)/adc/drv_adc.c
+INC      += -I'$(DRV_UART_DIR)/adc'
+
 #audio
 OC_FILES +=  $(DRV_UART_DIR)/audio/amr_array.c
 OC_FILES +=  $(DRV_UART_DIR)/audio/amr_busy.c

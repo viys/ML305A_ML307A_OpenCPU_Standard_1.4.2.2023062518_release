@@ -8,7 +8,8 @@
 #define FlagCLR(Flag,bit)	(Flag &= ~(bit))	//Flag清位
 #define FlagGET(Flag,bit)	(Flag & (bit))		//Flag获取
 
-
+/* 定时器 */
+extern osTimerId_t HeartBeat_Timer;
 
 /* 互斥量 */
 extern osMutexId_t TASK_MT;
@@ -78,5 +79,12 @@ void Transceiver_Thread(void* param);
  * @param param 
  */
 void Socket_Client_Thread(void* param);
+
+/**
+ * @brief 心跳定时器
+ * 
+ * @param param 
+ */
+void Heart_Beat_Timer(void* param);
 
 #endif // !__APP_H

@@ -13,7 +13,10 @@
 osThreadId_t ThreadI_DT;   // 线程ID标识
 osThreadAttr_t THREAD_CFG; // 线程配置结构体
 
-/*串口信号量*/
+/* 定时器 */
+osTimerId_t HeartBeat_Timer = NULL;
+
+/* 串口信号量 */
 osSemaphoreId_t u0_uart_sem = NULL;
 osSemaphoreId_t button_sem = NULL;
 osMessageQueueId_t button_click_queue = NULL;
@@ -37,5 +40,7 @@ int cm_opencpu_entry(char *param)
 	/* 创建Transceiver进程 */
 	osThreadCreat("click", Socket_Client_Thread, 5, 1024);
 
+	HeartBeat_Timer = osTimerCreat("HeartBeat",Heart_Beat_Timer,osTimerPeriodic);
+	
 	return 0;
 }

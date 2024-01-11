@@ -8,10 +8,12 @@
 #include "socket_client.h"
 #include "drv_socket.h"
 #include "drv_audio.h"
+#include "battery.h"
 
 #define DBG_NAME "app"
 
 BUTTON* Button = NULL;
+BATTERY* Battery = NULL;
 TRANSCEIVER* Transceiver = NULL;
 SOCKETSERVER* SocketClient = NULL;
 
@@ -24,10 +26,17 @@ void dbg_th(void* argument)
     DBG_F("hmi_uart_sem ID: %d\r\n", u0_uart_sem);
     
     while(1){
+        #if 0
         osSemaphoreAcquire(u0_uart_sem, osWaitForever);
         readLen = u0_uart_read(rxBuff);
         my_virt_at_test((unsigned char*)rxBuff, strlen(rxBuff));
         u0_printf("Send %s (%d)\r\n",rxBuff , readLen);
+        #else
+        osDelayMs(1000);
+        Battery->interface.update_level(Battery);
+        u0_printf("%d\n", Battery->interface.get_level(Battery));
+        // u0_printf("%d\n", Battery->interface.update_level(Battery));
+        #endif
     }
 }
 
@@ -93,13 +102,17 @@ void Transceiver_Thread(void* param)
         .imsi = "12345678901234567890",
         .targt.imei = "2234567890"
     };
-
+    
     Transceiver  = TRANSCEIVER_CTOR();
     Transceiver->init(Transceiver, info);
 
     TRANSCEIVER_IMPLEMENTS* phone = (TRANSCEIVER_IMPLEMENTS*)Transceiver;
 
     transceiver_queue = osMessageQueueNew(4, sizeof(void*), NULL);
+
+    Battery = BATTERY_CTOR();
+    Battery->init(Battery);
+    BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;    
 
     my_amr_load_files();
     my_audio_init(100);
@@ -230,8 +243,6 @@ void Socket_Client_Thread(void* param)
         .callback = socket_rev_callback
     };
 
-    my_device_par();
-
     SocketClient = SOCKETSERVER_CTOR();
 
     my_network_io_init();
@@ -245,12 +256,17 @@ void Socket_Client_Thread(void* param)
 
     socket_send_queue = osMessageQueueNew(4, sizeof(void*), NULL);
 
+    osTimerStart(HeartBeat_Timer, 4000/5);
+
     while(1){
         osMessageQueueGet(socket_send_queue, &massgeQ, 0, osWaitForever);
         socketCtrl->ssend(SocketClient, massgeQ, 10);
-        // socketCtrl->ssend()
-        
     }
+}
+
+void Heart_Beat_Timer(void* param)
+{
+    Battery->interface.update_level(Battery);
 }
 
 osThreadId_t osThreadCreat(const char * name,osThreadFunc_t func,osPriority_t priority,uint32_t stacksize)

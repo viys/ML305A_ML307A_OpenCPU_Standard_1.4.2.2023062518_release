@@ -4,6 +4,7 @@
 #include "string.h"
 #include "drv_audio.h"
 #include "drv_uart.h"
+#include "cm_sim.h"
 
 #define DBG_NAME "phone"
 
@@ -14,6 +15,20 @@ int transceiver_init(void* t ,TransceiverInfo device)
     this->status = TRANSMITTER_OFFLINE;
     memcpy(&this->info, &device, sizeof(TransceiverInfo));
     DBG_F("Transceiver init successed\r\n");
+
+    /*获取IMEI*/
+    while ((ret = cm_sys_get_imei(this->info.imei))!=0){
+        DBG_W("Get device IMEI failed: %d\r\n",ret);
+        osDelayMs(10);
+    }
+    DBG_I("Device\tIMEI: %s\r\n", this->info.imei);
+
+    /*获取SIM卡IMSI*/
+    while ((ret = cm_sim_get_imsi(this->info.imsi))!=0){
+        DBG_W("Get SIM IMSI failed: %d\r\n",ret);
+        osDelayMs(2000);
+    }
+    DBG_I("SIM\tIMSI: %s\r\n",this->info.imsi);
 
     return ret;
 }
