@@ -32,6 +32,7 @@ void dbg_th(void* argument)
         my_virt_at_test((unsigned char*)rxBuff, strlen(rxBuff));
         u0_printf("Send %s (%d)\r\n",rxBuff , readLen);
         #else
+        /* 充电时可以高速检测 */
         osDelayMs(1000);
         Battery->interface.update_level(Battery);
         u0_printf("%d\n", Battery->interface.get_level(Battery));
@@ -113,12 +114,6 @@ void Transceiver_Thread(void* param)
     Battery = BATTERY_CTOR();
     Battery->init(Battery);
     BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;    
-
-    my_amr_load_files();
-    my_audio_init(100);
-
-    my_audio_io_init();
-    my_audio_io_sw(1);
 
     phone->online(Transceiver);
 

@@ -1,11 +1,14 @@
 #pragma once
 
 #define BATTERY_CUTOFF_VOLTAGE      3000 // 3.0V
-#define BATTERY_FULL_VOLTAGE        4200 // 4.2V
+#define BATTERY_FULL_VOLTAGE        4128 // 4.2V
 #define BATTERY_SAVING_MODE_PER     30   // %
+#define BATTERY_CHARG_END_PER       135  // % 拔掉后为94%
+#define BATTERY_CHARGING_PER        110  // % 
 
 typedef enum{
     BATTERY_CHARGING = 0x00, // 充电中
+    BATTERY_CHARGED,         // 充电完成
     BATTERY_WORKING,         // 工作中
     BATTERY_SAVING_MODE,     // 省电中
 }BatteryMode;

@@ -72,7 +72,11 @@ int battery_update_level(void* t)
     this->info.voltage = update(&batteryFilter, voltage) * 4;
 
     this->info.level = (int)((float)(this->info.voltage - BATTERY_CUTOFF_VOLTAGE) / (float)(BATTERY_FULL_VOLTAGE - BATTERY_CUTOFF_VOLTAGE) * 100);
-    if(this->info.level > 100){
+    
+    if(this->info.level >= BATTERY_CHARG_END_PER){
+        /* 电池充电完成 */
+        this->info.mode = BATTERY_CHARGED;
+    }else if(this->info.level >= BATTERY_CHARGING_PER){
         /* 电池充电中 */
         this->info.mode = BATTERY_CHARGING;
     }else if(this->info.level >= BATTERY_SAVING_MODE_PER){

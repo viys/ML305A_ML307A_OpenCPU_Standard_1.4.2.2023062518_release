@@ -5,6 +5,7 @@
 #include "drv_audio.h"
 #include "drv_uart.h"
 #include "cm_sim.h"
+#include "drv_gpio.h"
 
 #define DBG_NAME "phone"
 
@@ -14,8 +15,7 @@ int transceiver_init(void* t ,TransceiverInfo device)
     TRANSCEIVER* this = (TRANSCEIVER*)t;
     this->status = TRANSMITTER_OFFLINE;
     memcpy(&this->info, &device, sizeof(TransceiverInfo));
-    DBG_F("Transceiver init successed\r\n");
-
+    
     /*获取IMEI*/
     while ((ret = cm_sys_get_imei(this->info.imei))!=0){
         DBG_W("Get device IMEI failed: %d\r\n",ret);
@@ -30,6 +30,14 @@ int transceiver_init(void* t ,TransceiverInfo device)
     }
     DBG_I("SIM\tIMSI: %s\r\n",this->info.imsi);
 
+    my_amr_load_files();
+    my_audio_init(100);
+
+    my_audio_io_init();
+    my_audio_io_sw(1);
+
+    DBG_F("Transceiver init successed\r\n");
+    
     return ret;
 }
 
