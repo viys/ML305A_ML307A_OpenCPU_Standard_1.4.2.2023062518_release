@@ -30,12 +30,6 @@ int transceiver_init(void* t ,TransceiverInfo device)
     }
     DBG_I("SIM\tIMSI: %s\r\n",this->info.imsi);
 
-    my_amr_load_files();
-    my_audio_init(100);
-
-    my_audio_io_init();
-    my_audio_io_sw(1);
-
     DBG_F("Transceiver init successed\r\n");
     
     return ret;

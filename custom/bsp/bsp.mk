@@ -17,8 +17,8 @@ OC_FILES +=  $(DRV_UART_DIR)/socket_client.c
 #battery
 OC_FILES +=  $(DRV_UART_DIR)/battery.c
 
-#bsp_dial
-# OC_FILES +=  $(DRV_UART_DIR)/bsp_dial.c
+#intercom
+OC_FILES +=  $(DRV_UART_DIR)/intercom.c
 
 # #bsp_call
 # OC_FILES +=  $(DRV_UART_DIR)/bsp_call.c

@@ -29,7 +29,7 @@
  * @param volume 音量
  * @return uint32_t 
  */
-uint32_t my_audio_init(uint8_t volume);
+uint32_t my_audio_init(uint8_t volume, uint8_t gain);
 
 /**
  * @brief amr铃声播放函数

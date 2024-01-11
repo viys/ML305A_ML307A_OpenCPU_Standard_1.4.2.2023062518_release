@@ -40,7 +40,6 @@ typedef struct
     int (*hangup)(void*);
     int (*ring)(void*, const char*);
     int (*init)(void*, TransceiverInfo);
-    int (*audio_en)(void*, int);
 }TRANSCEIVER;
 
 TRANSCEIVER* TRANSCEIVER_CTOR(void);

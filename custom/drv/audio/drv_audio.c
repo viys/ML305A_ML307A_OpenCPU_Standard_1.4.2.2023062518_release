@@ -3,11 +3,11 @@
 
 #define DBG_NAME "audio"
 
-uint32_t my_audio_init(uint8_t volume)
+uint32_t my_audio_init(uint8_t volume, uint8_t gain)
 {
     uint32_t ret = 0;
     uint8_t volume_temp = volume;
-    uint8_t volume_re = 0;
+    uint8_t volume_re = gain;
     /*设置声音大小*/
     ret = cm_audio_play_set_cfg(CM_AUDIO_PLAY_CFG_VOLUME, &volume_temp);
     ret = cm_audio_record_set_cfg(CM_AUDIO_RECORD_CFG_GAIN, &volume_re);
