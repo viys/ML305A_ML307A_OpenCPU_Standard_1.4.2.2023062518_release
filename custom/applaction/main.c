@@ -29,16 +29,16 @@ int cm_opencpu_entry(char *param)
 	u0_printf("ML307A Start\r\n");
 
 	/* 创建进程 */
-	osThreadCreat("dbg_th", dbg_th, 4, 1024);
+	// osThreadCreat("dbg_th", dbg_th, 4, 1024);
 
 	/* 创建Button进程 */
-	osThreadCreat("click", Button_Click_Thread, 7, 1024);
+	// osThreadCreat("click", Button_Click_Thread, 7, 1024);
 
 	/* 创建Transceiver进程 */
-	osThreadCreat("click", Transceiver_Thread, 6, 1024*4);
+	// osThreadCreat("click", Transceiver_Thread, 6, 1024*4);
 
 	/* 创建Transceiver进程 */
-	osThreadCreat("click", Socket_Client_Thread, 5, 1024);
+	osThreadCreat("click", Socket_Client_Thread, 5, 1024*4);
 
 	HeartBeat_Timer = osTimerCreat("HeartBeat",Heart_Beat_Timer,osTimerPeriodic);
 	

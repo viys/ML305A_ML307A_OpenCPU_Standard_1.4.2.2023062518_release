@@ -34,8 +34,8 @@ void dbg_th(void* argument)
         #else
         /* 充电时可以高速检测 */
         osDelayMs(1000);
-        Battery->interface.update_level(Battery);
-        u0_printf("%d\n", Battery->interface.get_level(Battery));
+        // Battery->interface.update_level(Battery);
+        // u0_printf("%d\n", Battery->interface.get_level(Battery));
         // u0_printf("%d\n", Battery->interface.update_level(Battery));
         #endif
     }
@@ -79,7 +79,7 @@ void Button_Click_Thread(void* param)
             checkRet =  buttonCtrl->check(Button);
             if(checkRet != BUTTON_RELEASED){
                 void* msg = cm_malloc(1);
-                ((uint8_t*)msg)[0] = checkRet; //对应通道宏定义
+                ((uint8_t*)msg)[0] = checkRet;
                 osMessageQueuePut(transceiver_queue, &msg, 0, 0);
             }
             break;
@@ -156,6 +156,7 @@ void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
     case CM_ASOCKET_EV_CONNECT_OK: {
         /*直接赋值为1清除其他位*/
         // MySocket_CB.status = 1;
+        my_network_io_sw(1);
         DBG_I("sock(%d) connect_ok\r\n", sock);
         break;
     }
@@ -189,6 +190,7 @@ void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
                 /*全部状态清空*/
                 // MySocket_CB.status = 0;
                 // my_netled_status_sw(0);
+                my_network_io_sw(0);
                 DBG_I("sock(%d) recv_ind: Connection closed\r\n", MyTCP_CB.sock);
             }
         }
@@ -241,11 +243,10 @@ void Socket_Client_Thread(void* param)
     SocketClient = SOCKETSERVER_CTOR();
 
     my_network_io_init();
-    my_network_io_sw(1);
 
-    // while(SocketClient->init(SocketClient, info) != 0){
-    //     osDelayMs(1000);
-    // }
+    while(SocketClient->init(SocketClient, info) != 0){
+        osDelayMs(1000);
+    }
 
     SOCKETSERVER_IMPLEMENTS* socketCtrl = (SOCKETSERVER_IMPLEMENTS*)SocketClient;
 
