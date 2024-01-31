@@ -64,7 +64,7 @@ void my_close_audio_stream(void);
  * @note 对于PCM格式，传输数据须是帧长度的整数倍（例如，8k 16bit的PCM数据，每帧为320字节，传输的数据应是320的整数倍 \n
  * 对于AMR格式，传输数据若包含不完整帧数据可能出现爆破音
  */
-int my_push_audio_stream(uint8_t *data, uint32_t size);
+int my_push_audio_stream(char* data, int size);
 
 /**
  * @brief 开始录音
@@ -72,7 +72,7 @@ int my_push_audio_stream(uint8_t *data, uint32_t size);
  * @return int =  0 - 成功 \n
  *   = -1 - 失败
  */
-int my_record_start(void);
+int my_record_start(void (*record_cb)(cm_audio_record_event_e event, void *param));
 
 /**
  * @brief 结束录音
@@ -80,4 +80,7 @@ int my_record_start(void);
  */
 void my_record_stop(void);
 
+
 void my_audio_play_stop(void);
+
+int my_ring_play(const char *path, void (*player_callback)(cm_audio_play_event_e event, void *param));

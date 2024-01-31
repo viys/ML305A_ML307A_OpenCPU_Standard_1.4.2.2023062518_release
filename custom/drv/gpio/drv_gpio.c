@@ -149,20 +149,6 @@ cm_gpio_level_e my_call_level_get(cm_gpio_num_e gpio_num)
     return level;
 }
 
-int my_key_filtering(uint8_t ch_num)
-{
-    int ret = 0;
-    osDelayMs(200);
-    /*延迟后该案件依旧为高电平*/
-    /*按键IO映射为通道号 +1*/
-    if(my_call_level_get(ch_num+1)==1){
-        ret = 1;
-    }else{
-        ret = 0;
-    }
-    return ret;
-}
-
 int my_audio_io_init(void)
 {
     int ret = EOF;

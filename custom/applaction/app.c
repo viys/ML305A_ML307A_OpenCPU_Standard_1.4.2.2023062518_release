@@ -16,6 +16,7 @@ BUTTON* Button = NULL;
 BATTERY* Battery = NULL;
 TRANSCEIVER* Transceiver = NULL;
 SOCKETSERVER* SocketClient = NULL;
+// INTERCOM 
 
 void dbg_th(void* argument)
 {
@@ -34,8 +35,8 @@ void dbg_th(void* argument)
         #else
         /* 充电时可以高速检测 */
         osDelayMs(1000);
-        // Battery->interface.update_level(Battery);
-        // u0_printf("%d\n", Battery->interface.get_level(Battery));
+        Battery->interface.update_level(Battery);
+        u0_printf("%d\n", Battery->interface.get_level(Battery));
         // u0_printf("%d\n", Battery->interface.update_level(Battery));
         #endif
     }
@@ -90,22 +91,57 @@ void Button_Click_Thread(void* param)
 }
 
 
-#define PHONE_PRESS_RED     0x01
-#define PHONE_PRESS_GREEN   0x02
-#define PHONE_INCOMING      0x03
-#define PHONE_SET_TARGET    0x04
+
+static void my_record_cb(cm_audio_record_event_e event, void *param)
+{
+    /* 通知事件为中断触发，不可阻塞，不可做耗时较长的操作，例如不可使用UART打印log */
+    static int packLen = 0;
+    static char* recorddata = NULL;
+
+    cm_audio_record_data_t *record_data = (cm_audio_record_data_t *)param;
+
+    if (CM_AUDIO_RECORD_EVENT_DATA == event)
+    {
+        if(packLen == 0){
+            recorddata = (char*)cm_malloc(AMR_PACK_LEN);
+        }
+        
+        if(packLen < AMR_PACK_LEN){
+            memcpy(&recorddata[packLen], record_data->data, record_data->len);
+            packLen += record_data->len;
+        }else{
+            /*发送录音数据*/
+            osMessageQueuePut(transceiver_queue, &recorddata, 0, 0);
+            packLen = 0;
+        }
+    }
+}
+
+//播放回调函数
+static void my_player_cb(cm_audio_play_event_e event, void *param)
+{
+    if (event == CM_AUDIO_PLAY_EVENT_FINISHED)                      //判断播放结束
+    {   
+        /* 通知事件为中断触发，不可阻塞，不可做耗时较长的操作，例如不可使用UART打印log */
+    }
+}
+
 
 void Transceiver_Thread(void* param)
 {
     void* massgeQ = NULL;
-    TransceiverInfo info =  {
+    TransceiverCfg cfg =  {
         .imei = "123456789012345",
         .imsi = "12345678901234567890",
-        .targt.imei = "2234567890"
+        .targt.imei = "2234567890",
+        .player_cb = my_player_cb,
+        .record_cb = my_record_cb,
+        .volume = 100,
+        .gain = 0,
     };
     
-    Transceiver  = TRANSCEIVER_CTOR();
-    Transceiver->init(Transceiver, info);
+    Transceiver = TRANSCEIVER_CTOR();
+    Transceiver->init(Transceiver, cfg);
 
     TRANSCEIVER_IMPLEMENTS* phone = (TRANSCEIVER_IMPLEMENTS*)Transceiver;
 
@@ -132,12 +168,19 @@ void Transceiver_Thread(void* param)
             break;
         case PHONE_INCOMING:
             phone->incoming(Transceiver);
+            break;
         case PHONE_SET_TARGET:{
             TargetInfo info;
             memcpy(&info, massgeQ+1, sizeof(TargetInfo));
             phone->set_targt(Transceiver, info);
             break;
         }
+        case PHONE_RECORD_SEND:
+            
+            break;
+        case PHONE_RECORD_RECV:
+
+            break;
         default:
             break;
         }
@@ -169,11 +212,11 @@ void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
     case CM_ASOCKET_EV_RECV_IND: {
         /* 取得获取接收缓存中可读的数据长度 */
         int recv_avail = 0;
-        cm_asocket_ioctl(SocketClient->socket, FIONREAD, &recv_avail);
+        cm_asocket_ioctl(sock, FIONREAD, &recv_avail);
 
         /* 接收数据 */
         memset(recv_buf, 0, 324+8);
-        int ret = cm_asocket_recv(SocketClient->socket, recv_buf, sizeof(recv_buf), 0);
+        int ret = cm_asocket_recv(sock, recv_buf, sizeof(recv_buf), 0);
         if (ret > 0){
             // my_socket_recv_handle(recv_buf);
             // DBG_I("sock(%d) recv_ind: recv_avail=%d, recv_len=%d, data=%x %x %x %x %x %x %x %x %x\r\n"
@@ -182,7 +225,7 @@ void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
         }
         else
         {
-            DBG_I("sock(%d) recv_ind error(%d)\r\n", SocketClient->socket, errno);
+            DBG_I("sock(%d) recv_ind error(%d)\r\n", sock, errno);
 
             if (ENOTCONN == errno)
             {
@@ -206,22 +249,22 @@ void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
         /* 获取socket错误码 */
         int sock_error = 0;
         socklen_t opt_len = sizeof(sock_error);
-        cm_asocket_getsockopt(SocketClient->socket, SOL_SOCKET, SO_ERROR, &sock_error, &opt_len);
-        DBG_I("sock(%d) error_ind: sock_error(%d)\r\n", SocketClient->socket, sock_error);
+        cm_asocket_getsockopt(sock, SOL_SOCKET, SO_ERROR, &sock_error, &opt_len);
+        DBG_I("sock(%d) error_ind: sock_error(%d)\r\n", sock, sock_error);
         if (ECONNABORTED == sock_error)
         {
             /* Connection aborted */
-            DBG_I("sock(%d) error_ind: Connection aborted\r\n", SocketClient->socket);
+            DBG_I("sock(%d) error_ind: Connection aborted\r\n", sock);
         }
         else if (ECONNRESET == sock_error)
         {
             /* Connection reset */
-            DBG_I("sock(%d) error_ind: Connection reset\r\n", SocketClient->socket);
+            DBG_I("sock(%d) error_ind: Connection reset\r\n", sock);
         }
         else if (ENOTCONN == sock_error)
         {
             /* Connection closed */
-            DBG_I("sock(%d) error_ind: Connection closed\r\n", SocketClient->socket);
+            DBG_I("sock(%d) error_ind: Connection closed\r\n", sock);
         }
         break;
     }

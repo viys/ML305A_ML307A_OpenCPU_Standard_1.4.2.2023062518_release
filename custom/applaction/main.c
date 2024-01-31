@@ -9,6 +9,7 @@
  * 
  */
 #include "app.h"
+#include "drv_gpio.h"
 
 osThreadId_t ThreadI_DT;   // 线程ID标识
 osThreadAttr_t THREAD_CFG; // 线程配置结构体
@@ -26,16 +27,17 @@ osMessageQueueId_t socket_send_queue = NULL;
 int cm_opencpu_entry(char *param)
 {
 	uart_open(CM_UART_DEV_0, 921600, u0_callback);
+	my_run_io_init();
 	u0_printf("ML307A Start\r\n");
-
+	my_run_io_sw(1);
 	/* 创建进程 */
 	// osThreadCreat("dbg_th", dbg_th, 4, 1024);
 
 	/* 创建Button进程 */
-	// osThreadCreat("click", Button_Click_Thread, 7, 1024);
+	osThreadCreat("click", Button_Click_Thread, 7, 1024);
 
 	/* 创建Transceiver进程 */
-	// osThreadCreat("click", Transceiver_Thread, 6, 1024*4);
+	osThreadCreat("click", Transceiver_Thread, 6, 1024*4);
 
 	/* 创建Transceiver进程 */
 	osThreadCreat("click", Socket_Client_Thread, 5, 1024*4);

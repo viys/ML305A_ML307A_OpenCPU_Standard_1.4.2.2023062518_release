@@ -19,6 +19,8 @@ typedef struct{
 
 typedef struct{
     int (*ring)(void*);
+    int (*open_stream)(void*);
+    int (*close_stream)(void*);
 }INTERCOM_IMPLEMENTS;
 
 typedef struct{

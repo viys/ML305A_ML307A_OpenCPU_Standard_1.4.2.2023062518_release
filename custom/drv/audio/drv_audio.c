@@ -27,14 +27,14 @@ static void __cm_record_cb(cm_audio_record_event_e event, void *param)
     }
 }
 
-int my_record_start(void)
+int my_record_start(void (*record_cb)(cm_audio_record_event_e event, void *param))
 {
     int ret = EOF;
     // cm_audio_sample_param_t frame = {.sample_format = CM_AUDIO_SAMPLE_FORMAT_16BIT, .rate = CM_AUDIO_SAMPLE_RATE_8000HZ, .num_channels = CM_AUDIO_SOUND_MONO};
     // ret = cm_audio_recorder_start(CM_AUDIO_RECORD_FORMAT_PCM, &frame, (cm_audio_record_callback_t)__cm_record_cb, "PCM");
     // ret = cm_audio_recorder_start(CM_AUDIO_RECORD_FORMAT_AMRNB_475, NULL, (cm_audio_record_callback_t)__cm_record_cb, "475");
     // ret = cm_audio_recorder_start(CM_AUDIO_RECORD_FORMAT_AMRNB_1220, &MyRecordFrame, (cm_audio_record_callback_t)__cm_record_cb, "1220");
-    ret = cm_audio_recorder_start(CM_AUDIO_RECORD_FORMAT_AMRNB_1220, NULL, (cm_audio_record_callback_t)__cm_record_cb, "1220");
+    ret = cm_audio_recorder_start(CM_AUDIO_RECORD_FORMAT_AMRNB_1220, NULL, (cm_audio_record_callback_t)record_cb, "1220");
     return ret;
 }
 
@@ -65,6 +65,34 @@ int my_ringtone_play(const char *path)
     return ret;
 }
 
+int my_ring_play(const char *path, void (*player_callback)(cm_audio_play_event_e event, void *param))
+{
+    int ret = 0;
+    ret = cm_audio_play_file(path, CM_AUDIO_PLAY_FORMAT_AMRNB, NULL, player_callback, "FILEAMR");
+    return ret;
+}
 
+int my_open_audio_stream(void)
+{
+    int ret = EOF;
+    
+    ret = cm_audio_player_stream_open(CM_AUDIO_PLAY_FORMAT_AMRNB, NULL);
+    return ret;
+}
+
+
+int my_push_audio_stream(char* data, int size)
+{
+    int ret = EOF;
+
+    ret = cm_audio_player_stream_push((uint8_t *)data, (uint32_t)size);
+    return ret;
+}
+
+void my_close_audio_stream(void)
+{
+    /*关闭音频数据流传输*/
+    cm_audio_player_stream_close();
+}
 
 

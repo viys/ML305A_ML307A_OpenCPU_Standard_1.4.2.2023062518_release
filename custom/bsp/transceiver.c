@@ -9,26 +9,33 @@
 
 #define DBG_NAME "phone"
 
-int transceiver_init(void* t ,TransceiverInfo device)
+int transceiver_init(void* t ,TransceiverCfg device)
 {
     int ret = 0;
     TRANSCEIVER* this = (TRANSCEIVER*)t;
+    memcpy(&this->cfg, &device, sizeof(TransceiverCfg));
+
     this->status = TRANSMITTER_OFFLINE;
-    memcpy(&this->info, &device, sizeof(TransceiverInfo));
+
+    my_amr_load_files();
+
+    ret += my_audio_init(this->cfg.volume, this->cfg.gain);
+
+    ret += my_audio_io_init();
     
     /*获取IMEI*/
-    while ((ret = cm_sys_get_imei(this->info.imei))!=0){
+    while ((ret = cm_sys_get_imei(this->cfg.imei))!=0){
         DBG_W("Get device IMEI failed: %d\r\n",ret);
         osDelayMs(10);
     }
-    DBG_I("Device\tIMEI: %s\r\n", this->info.imei);
+    DBG_I("Device\tIMEI: %s\r\n", this->cfg.imei);
 
     /*获取SIM卡IMSI*/
-    while ((ret = cm_sim_get_imsi(this->info.imsi))!=0){
+    while ((ret = cm_sim_get_imsi(this->cfg.imsi))!=0){
         DBG_W("Get SIM IMSI failed: %d\r\n",ret);
         osDelayMs(2000);
     }
-    DBG_I("SIM\tIMSI: %s\r\n",this->info.imsi);
+    DBG_I("SIM\tIMSI: %s\r\n",this->cfg.imsi);
 
     DBG_F("Transceiver init successed\r\n");
     
@@ -225,7 +232,7 @@ int transceiver_set_targt(void* t, TargetInfo target)
     int ret = 0;
     TRANSCEIVER* this = (TRANSCEIVER*)t;
 
-    memcpy(&this->info.targt, &target, sizeof(TargetInfo));
+    memcpy(&this->cfg.targt, &target, sizeof(TargetInfo));
 
     return ret;
 }
@@ -245,7 +252,7 @@ int transceiver_incoming(void* t)
     return ret;
 }
 
-int  transceiver_online(void* t)
+int transceiver_online(void* t)
 {
     int ret = 0;
     TRANSCEIVER* this = (TRANSCEIVER*)t;
@@ -259,6 +266,49 @@ int  transceiver_online(void* t)
     return ret;
 }
 
+int transceiver_open_stream(void* t)
+{
+    int ret = 0;
+    TRANSCEIVER* this = (TRANSCEIVER*)t;
+
+    my_audio_play_stop();
+    ret += my_record_start(this->cfg.record_cb);
+
+    ret += my_open_audio_stream();
+    
+    return ret;
+}
+
+int transceiver_play_stream(void* t, char* data, int len)
+{
+    int ret = 0;
+
+    /*需要完全关闭铃声播放才能打开*/
+    ret = my_push_audio_stream(data, len);
+    return ret;
+}
+
+int transceiver_send_stream(void* t)
+{
+    int ret = 0;
+    /*给socket发送消息队列*/
+
+    return ret;
+}
+
+int transceiver_close_stream(void* t)
+{
+    int ret = 0;
+    TRANSCEIVER* this = (TRANSCEIVER*)t;
+    
+    my_record_stop();
+    my_close_audio_stream();
+
+    return ret;
+}
+
+int transceiver_
+
 TRANSCEIVER* TRANSCEIVER_CTOR(void)
 {
     TRANSCEIVER *this = (TRANSCEIVER*)malloc(sizeof(TRANSCEIVER));
@@ -270,6 +320,10 @@ TRANSCEIVER* TRANSCEIVER_CTOR(void)
     this->hangup = transceiver_hangup;
     this->reject = transceiver_reject;
     this->ring = transceiver_ring;
+    this->open_stream = transceiver_open_stream;
+    this->play_stream = transceiver_play_stream;
+    this->send_stream = transceiver_send_stream;
+    this->close_stream = transceiver_close_stream;
     this->interface.get_status = transceiver_get_status;
     this->interface.incoming = transceiver_incoming;
     this->interface.set_targt = transceiver_set_targt;
