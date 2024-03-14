@@ -4,8 +4,8 @@
 #include "cm_audio_player.h"
 #include "cm_audio_recorder.h"
 #include "sys\types.h"
-#include "amr_array.h"
-
+#include "mp3_array.h"
+int my_ringtone_play1(const char *path);
 /* 语音 */
 /*
  * 1.正在连接网络,请稍后

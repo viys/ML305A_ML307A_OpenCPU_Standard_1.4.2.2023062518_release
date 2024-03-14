@@ -46,19 +46,19 @@ int intercom_ring_play(void* t)
     switch(*(this->parentState))
     {
     case TRANSMITTER_OFFLINE:
-        my_ring_play(AMR_CONNECT_PATH, this->cfg.player_cb);
+        my_ring_play(MP3_CALLSTART_PATH, this->cfg.player_cb);
         break;
     case TRANSMITTER_IDLE:
-        my_ring_play(AMR_CALLSTART_PATH, this->cfg.player_cb);
+        my_ring_play(MP3_CLOSELOCK_PATH, this->cfg.player_cb);
         break;
     case TRANSMITTER_TARGETBUSY:
-        my_ring_play(AMR_BUSY_PATH, this->cfg.player_cb);
+        my_ring_play(MP3_LINKNET_PATH, this->cfg.player_cb);
         break;
     case TRANSCEIVER_HANGUP:
-        my_ring_play(AMR_CALLEND_PATH, this->cfg.player_cb);
+        my_ring_play(MP3_OPENCLOK_PATH, this->cfg.player_cb);
         break;
     case TRANSCEIVER_TIMEOUT:
-        my_ring_play(AMR_TIMEOUT_PATH, this->cfg.player_cb);
+        my_ring_play(MP3_LINKNET_PATH, this->cfg.player_cb);
         break;
     case TRANSCEIVER_INCOMING:
         ret = -1;

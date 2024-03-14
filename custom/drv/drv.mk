@@ -20,12 +20,19 @@ INC      += -I'$(DRV_UART_DIR)/socket'
 OC_FILES +=  $(DRV_UART_DIR)/adc/drv_adc.c
 INC      += -I'$(DRV_UART_DIR)/adc'
 
+#mqtt
+OC_FILES +=  $(DRV_UART_DIR)/mqtt/drv_mqtt.c
+INC      += -I'$(DRV_UART_DIR)/mqtt'
+
+#mqtt
+OC_FILES +=  $(DRV_UART_DIR)/ntp/drv_ntp.c
+INC      += -I'$(DRV_UART_DIR)/ntp'
+
 #audio
-OC_FILES +=  $(DRV_UART_DIR)/audio/amr_array.c
-OC_FILES +=  $(DRV_UART_DIR)/audio/amr_busy.c
-OC_FILES +=  $(DRV_UART_DIR)/audio/amr_callend.c
-OC_FILES +=  $(DRV_UART_DIR)/audio/amr_callstart.c
-OC_FILES +=  $(DRV_UART_DIR)/audio/amr_connect.c
-OC_FILES +=  $(DRV_UART_DIR)/audio/amr_timeout.c
+OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_array.c
+OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_linknet.c
+OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_callstart.c
+OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_openlock.c
+OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_closelock.c
 OC_FILES +=  $(DRV_UART_DIR)/audio/drv_audio.c
 INC      += -I'$(DRV_UART_DIR)/audio'

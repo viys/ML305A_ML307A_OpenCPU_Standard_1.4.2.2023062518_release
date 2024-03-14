@@ -58,14 +58,21 @@ static void __cm_player_process_event(cm_audio_play_event_e event, void *param)
     }
 }
 
-int my_ringtone_play(const char *path)
+int my_ringtone_play1(const char *path)
 {
     int ret = 0;
     ret = cm_audio_play_file(path, CM_AUDIO_PLAY_FORMAT_AMRNB, NULL, __cm_player_process_event, "FILEAMR");
     return ret;
 }
 
-int my_ring_play(const char *path, void (*player_callback)(cm_audio_play_event_e event, void *param))
+int my_ringtone_play(const char *path)
+{
+    int ret = 0;
+    ret = cm_audio_play_file(path, CM_AUDIO_PLAY_FORMAT_MP3, NULL, __cm_player_process_event, "FILEMP3");
+    return ret;
+}
+
+int my_ring_play1(const char *path, void (*player_callback)(cm_audio_play_event_e event, void *param))
 {
     int ret = 0;
     ret = cm_audio_play_file(path, CM_AUDIO_PLAY_FORMAT_AMRNB, NULL, player_callback, "FILEAMR");

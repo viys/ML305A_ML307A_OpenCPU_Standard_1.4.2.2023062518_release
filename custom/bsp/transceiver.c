@@ -158,12 +158,12 @@ int transceiver_press_green(void* t)
     {
     case TRANSMITTER_OFFLINE:
         DBG_F("Transceiver offline\r\n");
-        this->ring(this, AMR_CONNECT_PATH);
+        this->ring(this, MP3_CALLSTART_PATH);
         ret = -1;
         break;
     case TRANSMITTER_IDLE:
         DBG_F("Transceiver call imei\r\n");
-        this->ring(this, AMR_CALLSTART_PATH);
+        this->ring(this, MP3_LINKNET_PATH);
         this->dial(this);
         ret = 0;
         break;
@@ -195,12 +195,12 @@ int transceiver_press_red(void* t)
     {
     case TRANSMITTER_OFFLINE:
         DBG_F("Transceiver offline\r\n");
-        this->ring(this, AMR_CONNECT_PATH);
+        this->ring(this, MP3_LINKNET_PATH);
         ret = -1;
         break;
     case TRANSMITTER_IDLE:
         DBG_F("Send message\r\n");
-        this->ring(this, AMR_TIMEOUT_PATH);
+        this->ring(this, MP3_CALLSTART_PATH);
         ret = 0;
         break;
     case TRANSMITTER_DIAL:
@@ -211,13 +211,13 @@ int transceiver_press_red(void* t)
     case TRANSCEIVER_BUSY_LINE:
         DBG_F("Transceiver busy");
         this->hangup(this);
-        this->ring(this, AMR_CALLEND_PATH);
+        this->ring(this, MP3_CLOSELOCK_PATH);
         ret = 0;
         break;
     case TRANSCEIVER_INCOMING:
         DBG_F("Reject incoming call\r\n");
         this->reject(this);
-        this->ring(this, AMR_CALLSTART_PATH);
+        this->ring(this, MP3_OPENCLOK_PATH);
         ret = 0;
         break;
     default:
@@ -307,7 +307,7 @@ int transceiver_close_stream(void* t)
     return ret;
 }
 
-int transceiver_
+// int transceiver_
 
 TRANSCEIVER* TRANSCEIVER_CTOR(void)
 {

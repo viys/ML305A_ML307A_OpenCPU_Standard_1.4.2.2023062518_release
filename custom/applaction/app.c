@@ -9,6 +9,9 @@
 #include "drv_socket.h"
 #include "drv_audio.h"
 #include "battery.h"
+#include "drv_ntp.h"
+#include "drv_mqtt.h"
+#include "mqtt_client.h"
 
 #define DBG_NAME "app"
 
@@ -16,30 +19,59 @@ BUTTON* Button = NULL;
 BATTERY* Battery = NULL;
 TRANSCEIVER* Transceiver = NULL;
 SOCKETSERVER* SocketClient = NULL;
+MQTTCLIENT* MqttClient = NULL;
 // INTERCOM 
+
+const char productKey[] = "a16bTikWROS";
+const char deviceName[] = "n001";
+const char deviceSecret[] = "f3640db1414c5883b7996ebdfb0eb958";
+const char pubTopic[] = "/a16bTikWROS/n001/user/cmdSend";
+const char subTopic[] = "/a16bTikWROS/n001/user/cmdRcv";
+const char mqttHost[] = "iot-06z00b0c4a5stcb.mqtt.iothub.aliyuncs.com";
 
 void dbg_th(void* argument)
 {
-    /*串口由于LOG功能,已在cm_opencpu_entry()开头初始化*/
-    int readLen = 0 ;
-    /* 创建信号量 */
-	u0_uart_sem = osSemaphoreNew(1, 0, NULL);
-    DBG_F("hmi_uart_sem ID: %d\r\n", u0_uart_sem);
     
+
+
     while(1){
-        #if 0
-        osSemaphoreAcquire(u0_uart_sem, osWaitForever);
-        readLen = u0_uart_read(rxBuff);
-        my_virt_at_test((unsigned char*)rxBuff, strlen(rxBuff));
-        u0_printf("Send %s (%d)\r\n",rxBuff , readLen);
-        #else
-        /* 充电时可以高速检测 */
+        // mqtt->pub(mqtt, (char*)pubTopic, sizeof(pubTopic));
         osDelayMs(1000);
-        Battery->interface.update_level(Battery);
-        u0_printf("%d\n", Battery->interface.get_level(Battery));
-        // u0_printf("%d\n", Battery->interface.update_level(Battery));
-        #endif
     }
+    
+    // int ret = 0;
+    // /*串口由于LOG功能,已在cm_opencpu_entry()开头初始化*/
+    // int readLen = 0 ;
+    // /* 创建信号量 */
+	// u0_uart_sem = osSemaphoreNew(1, 0, NULL);
+    // DBG_F("hmi_uart_sem ID: %d\r\n", u0_uart_sem);
+    
+    // // while(1){
+    //     // ret = cm_test_ntp();
+    // //     DBG_W("ret: %d", ret);
+    // //     if(ret != 0) break;
+    // //     osDelayMs(400);
+    // // }
+
+    // // cm_test_aliyun();
+    // // while(cm_test_ntp() != 0){
+    // //     osDelayMs(400);
+    // // }
+    
+    // while(1){
+    //     #if 0
+    //     osSemaphoreAcquire(u0_uart_sem, osWaitForever);
+    //     readLen = u0_uart_read(rxBuff);
+    //     my_virt_at_test((unsigned char*)rxBuff, strlen(rxBuff));
+    //     u0_printf("Send %s (%d)\r\n",rxBuff , readLen);
+    //     #else
+    //     /* 充电时可以高速检测 */
+    //     osDelayMs(1000);
+    //     // Battery->interface.update_level(Battery);
+    //     // u0_printf("%d\n", Battery->interface.get_level(Battery));
+    //     // // u0_printf("%d\n", Battery->interface.update_level(Battery));
+    //     #endif
+    // }
 }
 
 void my_button_callback(void){
@@ -142,6 +174,8 @@ void Transceiver_Thread(void* param)
     
     Transceiver = TRANSCEIVER_CTOR();
     Transceiver->init(Transceiver, cfg);
+
+    my_audio_io_sw(1);
 
     TRANSCEIVER_IMPLEMENTS* phone = (TRANSCEIVER_IMPLEMENTS*)Transceiver;
 
@@ -275,31 +309,58 @@ void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
 
 void Socket_Client_Thread(void* param)
 {
-    void* massgeQ = NULL;
-    SocketInfo info = {
-        // .ip = "1234567890",
-        .addr = "60.205.170.65",
-        .port = 8107,
-        .callback = socket_rev_callback
+    MqttClientInfo mqttInfo = {
+        .mqttHost = mqttHost,
+        .productKey = productKey,
+        .deviceName = deviceName,
+        .deviceSecret = deviceSecret,
+        .pubTopic = pubTopic,
+        .subTopic = subTopic
     };
 
-    SocketClient = SOCKETSERVER_CTOR();
+    MqttClient = MQTTCLIENT_CTOR();
+    
+
+    void* mqtt_handle = NULL;
+    void* massgeQ = NULL;
 
     my_network_io_init();
 
-    while(SocketClient->init(SocketClient, info) != 0){
-        osDelayMs(1000);
-    }
-
-    SOCKETSERVER_IMPLEMENTS* socketCtrl = (SOCKETSERVER_IMPLEMENTS*)SocketClient;
+    // while(SocketClient->init(SocketClient, info) != 0){
+    //     osDelayMs(1000);
+    // }
 
     socket_send_queue = osMessageQueueNew(4, sizeof(void*), NULL);
 
     osTimerStart(HeartBeat_Timer, 4000/5);
+    my_ntp_get();
+    while(ntpTemp == 0)
+    {
+        osDelayMs(1000);
+    }
+    // cm_test_aliyun();
+    MqttClient->init(MqttClient, mqttInfo);
 
+    osDelayMs(1000);
+
+    MQTTCLIENT_IMPLEMENTS *mqtt = (MQTTCLIENT_IMPLEMENTS*)MqttClient;
+
+    char *pub_payload = "{\"deviceType\":0,\"deviceId\":\"n001\",\"requestId\":\"wechat\",\"return\":{\"door\":\"open\"}}";
+    
+    mqtt->pub(mqtt, pub_payload, sizeof(pub_payload));
+    mqtt->sub(mqtt);
+    // my_aliyun_mqtt_connect(mqtt_handle);
+
+    // while(mqttTemp == 0)
+    // {
+    //     osDelayMs(1000);
+    // }
+
+    // my_topic_pub(mqtt_handle);
+    
     while(1){
         osMessageQueueGet(socket_send_queue, &massgeQ, 0, osWaitForever);
-        socketCtrl->ssend(SocketClient, massgeQ, 10);
+        // socketCtrl->ssend(SocketClient, massgeQ, 10);
     }
 }
 

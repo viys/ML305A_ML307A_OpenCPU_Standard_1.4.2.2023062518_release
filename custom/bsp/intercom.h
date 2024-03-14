@@ -1,7 +1,6 @@
 #pragma once
 #include "cm_audio_player.h"
 #include "cm_audio_recorder.h"
-#include "amr_array.h"
 #include "transceiver.h"
 
 typedef enum{

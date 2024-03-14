@@ -10,6 +10,7 @@
  */
 #include "app.h"
 #include "drv_gpio.h"
+#include "drv_ntp.h"
 
 osThreadId_t ThreadI_DT;   // 线程ID标识
 osThreadAttr_t THREAD_CFG; // 线程配置结构体
@@ -24,6 +25,8 @@ osMessageQueueId_t button_click_queue = NULL;
 osMessageQueueId_t transceiver_queue = NULL;
 osMessageQueueId_t socket_send_queue = NULL;
 
+#include "drv_mqtt.h"
+
 int cm_opencpu_entry(char *param)
 {
 	uart_open(CM_UART_DEV_0, 921600, u0_callback);
@@ -31,18 +34,27 @@ int cm_opencpu_entry(char *param)
 	u0_printf("ML307A Start\r\n");
 	my_run_io_sw(1);
 	/* 创建进程 */
-	// osThreadCreat("dbg_th", dbg_th, 4, 1024);
+	osThreadCreat("dbg_th", dbg_th, 4, 1024*4);
+	
+	// osDelayMs(1000*4);
+	// cm_test_aliyun();
+	// cm_test_mqtt(0);
+	// cm_test_mqtt(1);
 
 	/* 创建Button进程 */
 	osThreadCreat("click", Button_Click_Thread, 7, 1024);
 
-	/* 创建Transceiver进程 */
+	// /* 创建Transceiver进程 */
 	osThreadCreat("click", Transceiver_Thread, 6, 1024*4);
 
-	/* 创建Transceiver进程 */
+	// /* 创建Transceiver进程 */
 	osThreadCreat("click", Socket_Client_Thread, 5, 1024*4);
 
-	HeartBeat_Timer = osTimerCreat("HeartBeat",Heart_Beat_Timer,osTimerPeriodic);
+	// HeartBeat_Timer = osTimerCreat("HeartBeat",Heart_Beat_Timer,osTimerPeriodic);
 	
-	return 0;
+	// while (1)
+	// {
+	// 	osDelayMs(1000);
+	// }
+	return;
 }

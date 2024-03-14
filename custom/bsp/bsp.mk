@@ -20,6 +20,9 @@ OC_FILES +=  $(DRV_UART_DIR)/battery.c
 #intercom
 OC_FILES +=  $(DRV_UART_DIR)/intercom.c
 
+#intercom
+OC_FILES +=  $(DRV_UART_DIR)/mqtt_client.c
+
 # #bsp_call
 # OC_FILES +=  $(DRV_UART_DIR)/bsp_call.c
 
