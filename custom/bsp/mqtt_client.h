@@ -28,6 +28,7 @@ typedef enum
 
 typedef struct
 {
+    void (*init)(void*, MqttClientInfo);
     int (*pub)(void*, char*, int);
     int (*sub)(void*);
 }MQTTCLIENT_IMPLEMENTS;
@@ -38,7 +39,6 @@ typedef struct
     MQTTCLIENT_IMPLEMENTS api;
     MqttClientInfo info;
     MqttClientState state;
-    void (*init)(void*, MqttClientInfo);
     void (*rcv_handle)(void*, char*);
     void* handle;
 }MQTTCLIENT;

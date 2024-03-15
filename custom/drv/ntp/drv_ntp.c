@@ -30,7 +30,7 @@ static void __cm_ntp_cb(cm_ntp_event_e event, void *event_param, void *cb_param)
     else
     {
         DBG_I("[NTP][%s] error\r\n", (char *)cb_param); 
-        my_ntp_get();
+        // my_ntp_get();
     }
 }
 
@@ -47,7 +47,7 @@ int my_ntp_get(void)
     uint32_t dns_priority = 1;
     bool set_rtc = 1;
 
-    cm_ntp_set_cfg(CM_NTP_CFG_SERVER, "cn.ntp.org.cn"); 
+    cm_ntp_set_cfg(CM_NTP_CFG_SERVER, "ntp.aliyun.com"); 
     cm_ntp_set_cfg(CM_NTP_CFG_PORT, &port);
     cm_ntp_set_cfg(CM_NTP_CFG_TIMEOUT, &timeout);
     cm_ntp_set_cfg(CM_NTP_CFG_DNS, &dns_priority);

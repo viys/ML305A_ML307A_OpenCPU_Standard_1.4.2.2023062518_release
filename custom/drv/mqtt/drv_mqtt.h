@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-void cm_test_aliyun(void);
-
 /**
  * @brief 连接阿里云MQTT服务器函数
  * 

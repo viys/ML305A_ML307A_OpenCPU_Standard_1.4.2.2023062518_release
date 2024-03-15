@@ -3,6 +3,8 @@
 
 #include "includes.h"
 #include "drv_uart.h"
+#include "mqtt_client.h"
+#include "transceiver.h"
 
 #define FlagSET(Flag,bit)	(Flag |= (bit))		//Flag置位
 #define FlagCLR(Flag,bit)	(Flag &= ~(bit))	//Flag清位
@@ -19,7 +21,14 @@ extern osSemaphoreId_t button_sem;
 
 extern osMessageQueueId_t button_click_queue;
 extern osMessageQueueId_t transceiver_queue;
-extern osMessageQueueId_t socket_send_queue;
+extern osMessageQueueId_t mqtt_send_queue;
+osMessageQueueId_t mqtt_recv_queue;
+
+extern TRANSCEIVER* Transceiver;
+extern TRANSCEIVER_IMPLEMENTS* phone;
+
+extern MQTTCLIENT* MqttClient;
+extern MQTTCLIENT_IMPLEMENTS* mqtt;
 
 /* 定时器 */
 osTimerId_t TASK_TT;
@@ -60,6 +69,13 @@ void osDelayMs(uint32_t ms);
 void dbg_th(void* argument);
 
 /**
+ * @brief 启动函数
+ * 
+ * @param argument 
+ */
+void startup_th(void* argument);
+
+/**
  * @brief 按键点击线程
  * 
  * @param param 
@@ -74,11 +90,18 @@ void Button_Click_Thread(void* param);
 void Transceiver_Thread(void* param);
 
 /**
- * @brief socket客户端操作线程
+ * @brief MQTT客户端操作线程
  * 
  * @param param 
  */
-void Socket_Client_Thread(void* param);
+void MQTT_Client_Thread(void* param);
+
+/**
+ * @brief MQTT接收线程
+ * 
+ * @param param 
+ */
+void MQTT_RECV_Handle(void* param);
 
 /**
  * @brief 心跳定时器

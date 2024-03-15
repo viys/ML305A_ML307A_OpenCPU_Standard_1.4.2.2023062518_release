@@ -17,8 +17,14 @@
 #include "aiot_state_api.h"
 #include "aiot_sysdep_api.h"
 #include "aiot_mqtt_api.h"
+#include "cJSON.h"
 
 #define DBG_NAME "MQTT"
+
+int my_josn_handle(char* data)
+{
+    
+}
 
 static void mqtt_init(void* t, MqttClientInfo info)
 {
@@ -26,10 +32,12 @@ static void mqtt_init(void* t, MqttClientInfo info)
 
     memcpy(&this->info, &info, sizeof(MqttClientInfo));
 
-    if(this->info.deviceName == NULL){
-        DBG_E("DeviceName is NULL");
-        return;
-    }
+    vassert(this->info.mqttHost != NULL,"");
+    vassert(this->info.deviceName != NULL,"");
+    vassert(this->info.deviceSecret != NULL,"");
+    vassert(this->info.productKey != NULL,"");
+    vassert(this->info.pubTopic != NULL,"");
+    vassert(this->info.subTopic != NULL,"");
 
     this->state = IDLE;
 
@@ -46,7 +54,9 @@ static int mqtt_pub(void* t, char* payload, int len)
     int ret = 0;
     MQTTCLIENT* this = (MQTTCLIENT*)t;
 
-    ret = my_mqtt_topic_pub(this->handle, this->info.pubTopic, (uint8_t *)payload, len);
+    vassert(payload!=NULL, "");
+
+    ret = my_mqtt_topic_pub(this->handle, this->info.pubTopic, payload, len);
 
     if(ret >= STATE_SUCCESS){
         DBG_I("Mqtt pub: %*s\r\n", len, payload);
@@ -63,36 +73,38 @@ static int mqtt_sub(void* t)
     MQTTCLIENT* this = (MQTTCLIENT*)t;
 
     // DBG_E("this->info.subTopic: %s", this->info.subTopic)
-    // ret = my_mqtt_topic_sub(this->handle, this->info.subTopic);
-    char *sub_topic = "/a16bTikWROS/n001/user/cmdRcv";
+    // char *sub_topic = "/a16bTikWROS/n001/user/cmdRcv";
 
-    ret = aiot_mqtt_sub(this->handle, sub_topic, NULL, 1, NULL);
-    if (ret < 0) {
-        DBG_I("aiot_mqtt_sub failed, res: -0x%04X\r\n", -ret);
-        return ret;
-    }
-
+    ret = my_mqtt_topic_sub(this->handle, this->info.subTopic);
     // if(ret >= STATE_SUCCESS){
     //     DBG_I("Mqtt sub success\r\n");
     // }else{
     //     DBG_E("Mqtt sub err");
     // }
+    
+    // ret = aiot_mqtt_sub(this->handle, sub_topic, NULL, 1, NULL);
+    // if (ret < 0) {
+    //     DBG_I("aiot_mqtt_sub failed, res: -0x%04X\r\n", -ret);
+    //     return ret;
+    // }
+
 
     return ret;
 }
 
 MqttClientState mqtt_get_state(void* t)
 {
-    // MQTTCLIENT;
-}
+    MQTTCLIENT* this = (MQTTCLIENT*)t;
 
+    return this->state;
+}
 
 MQTTCLIENT* MQTTCLIENT_CTOR(void)
 {
     MQTTCLIENT *this = (MQTTCLIENT*)malloc(sizeof(MQTTCLIENT));
 
     /* 接口对接 */
-    this->init = mqtt_init;
+    this->api.init = mqtt_init;
 
     this->api.pub = mqtt_pub;
     this->api.sub = mqtt_sub;

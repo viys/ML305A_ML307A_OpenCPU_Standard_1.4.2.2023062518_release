@@ -33,7 +33,7 @@ int transceiver_init(void* t ,TransceiverCfg device)
     /*获取SIM卡IMSI*/
     while ((ret = cm_sim_get_imsi(this->cfg.imsi))!=0){
         DBG_W("Get SIM IMSI failed: %d\r\n",ret);
-        osDelayMs(2000);
+        osDelayMs(500);
     }
     DBG_I("SIM\tIMSI: %s\r\n",this->cfg.imsi);
 

@@ -12,22 +12,16 @@
 #include "drv_ntp.h"
 #include "drv_mqtt.h"
 #include "mqtt_client.h"
+#include "cJSON.h"
 
 #define DBG_NAME "app"
 
 BUTTON* Button = NULL;
 BATTERY* Battery = NULL;
-TRANSCEIVER* Transceiver = NULL;
-SOCKETSERVER* SocketClient = NULL;
-MQTTCLIENT* MqttClient = NULL;
-// INTERCOM 
 
-const char productKey[] = "a16bTikWROS";
-const char deviceName[] = "n001";
-const char deviceSecret[] = "f3640db1414c5883b7996ebdfb0eb958";
-const char pubTopic[] = "/a16bTikWROS/n001/user/cmdSend";
-const char subTopic[] = "/a16bTikWROS/n001/user/cmdRcv";
-const char mqttHost[] = "iot-06z00b0c4a5stcb.mqtt.iothub.aliyuncs.com";
+SOCKETSERVER* SocketClient = NULL;
+
+// INTERCOM 
 
 void dbg_th(void* argument)
 {
@@ -162,6 +156,7 @@ static void my_player_cb(cm_audio_play_event_e event, void *param)
 void Transceiver_Thread(void* param)
 {
     void* massgeQ = NULL;
+
     TransceiverCfg cfg =  {
         .imei = "123456789012345",
         .imsi = "12345678901234567890",
@@ -171,21 +166,15 @@ void Transceiver_Thread(void* param)
         .volume = 100,
         .gain = 0,
     };
-    
-    Transceiver = TRANSCEIVER_CTOR();
+
     Transceiver->init(Transceiver, cfg);
-
     my_audio_io_sw(1);
-
-    TRANSCEIVER_IMPLEMENTS* phone = (TRANSCEIVER_IMPLEMENTS*)Transceiver;
+    phone->online(Transceiver);
 
     transceiver_queue = osMessageQueueNew(4, sizeof(void*), NULL);
-
     Battery = BATTERY_CTOR();
     Battery->init(Battery);
     BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;    
-
-    phone->online(Transceiver);
 
     while(1)
     {
@@ -224,143 +213,91 @@ void Transceiver_Thread(void* param)
     
 }
 
-char recv_buf[324+8];
-void socket_rev_callback(int sock, cm_asocket_event_e event, void *user_param)
+void MQTT_RECV_Handle(void* param)
 {
-    switch (event)
-    {
-    // responses
-    case CM_ASOCKET_EV_CONNECT_OK: {
-        /*直接赋值为1清除其他位*/
-        // MySocket_CB.status = 1;
-        my_network_io_sw(1);
-        DBG_I("sock(%d) connect_ok\r\n", sock);
-        break;
-    }
-    case CM_ASOCKET_EV_CONNECT_FAIL: {
-        DBG_I("sock(%d) connect_fail\r\n", sock);
-        break;
-    }
+    void* massgeQ = NULL;
+    cJSON* cjson_whole = NULL;
+    cJSON* cjson_deviceId = NULL;
+    cJSON* cjson_requestId = NULL;
+    cJSON* cjson_request = NULL;
+    cJSON* cjson_commend = NULL;
+    cJSON* cjson_item = NULL;
 
-    // indications
-    case CM_ASOCKET_EV_RECV_IND: {
-        /* 取得获取接收缓存中可读的数据长度 */
-        int recv_avail = 0;
-        cm_asocket_ioctl(sock, FIONREAD, &recv_avail);
+    mqtt_recv_queue = osMessageQueueNew(4, sizeof(void*), NULL);
 
-        /* 接收数据 */
-        memset(recv_buf, 0, 324+8);
-        int ret = cm_asocket_recv(sock, recv_buf, sizeof(recv_buf), 0);
-        if (ret > 0){
-            // my_socket_recv_handle(recv_buf);
-            // DBG_I("sock(%d) recv_ind: recv_avail=%d, recv_len=%d, data=%x %x %x %x %x %x %x %x %x\r\n"
-            //         , MyTCP_CB.sock, recv_avail, ret,
-            //         recv_buf[0],recv_buf[1],recv_buf[2],recv_buf[3],recv_buf[4],recv_buf[5],recv_buf[6],recv_buf[7],recv_buf[8]);
-        }
-        else
-        {
-            DBG_I("sock(%d) recv_ind error(%d)\r\n", sock, errno);
+    while(1){
+        osMessageQueueGet(mqtt_recv_queue, &massgeQ, 0, osWaitForever);
 
-            if (ENOTCONN == errno)
-            {
-                /* Connection closed */
-                /*全部状态清空*/
-                // MySocket_CB.status = 0;
-                // my_netled_status_sw(0);
-                my_network_io_sw(0);
-                DBG_I("sock(%d) recv_ind: Connection closed\r\n", MyTCP_CB.sock);
+        cjson_whole = cJSON_Parse(massgeQ);
+
+        cjson_commend = cJSON_GetObjectItem(cjson_whole, "commend");
+        if(cjson_commend){
+            cjson_item = cJSON_GetObjectItem(cjson_commend, "door");
+            if(cjson_item){
+                DBG_W("door: %s\r\n", cjson_item->valuestring);    
             }
         }
-        break;
-    }
-    case CM_ASOCKET_EV_SEND_IND:
-        // DBG_I("sock(%d) send_ind\r\n", MyTCP_CB.sock);
-        break;
-    case CM_ASOCKET_EV_ACCEPT_IND:
-        // DBG_I("sock(%d) accept_ind\r\n", MyTCP_CB.sock);
-        break;
-    case CM_ASOCKET_EV_ERROR_IND: {
-        /* 获取socket错误码 */
-        int sock_error = 0;
-        socklen_t opt_len = sizeof(sock_error);
-        cm_asocket_getsockopt(sock, SOL_SOCKET, SO_ERROR, &sock_error, &opt_len);
-        DBG_I("sock(%d) error_ind: sock_error(%d)\r\n", sock, sock_error);
-        if (ECONNABORTED == sock_error)
-        {
-            /* Connection aborted */
-            DBG_I("sock(%d) error_ind: Connection aborted\r\n", sock);
+
+        cjson_request = cJSON_GetObjectItem(cjson_whole, "request");
+        if(cjson_request){
+            DBG_W("request: %s\r\n", cjson_request->valuestring);
+            cJSON* root = cJSON_CreateObject();
+
+	        cJSON_AddStringToObject(root, "deviceId","n001");
+	        cJSON_AddStringToObject(root, "requestId","wechat");
+	        cJSON_AddBoolToObject(root, "deviceType", 0);
+
+            cJSON* info = cJSON_CreateObject();
+	        cJSON_AddStringToObject(info, "imei", Transceiver->cfg.imei);
+
+            cJSON_AddItemToObject(root, "deviceInfo", info);
+
+            void* msg = cm_malloc(sizeof(15));
+            msg = (void*)cJSON_PrintUnformatted(root);
+            
+            osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+            cJSON_Delete(root);
         }
-        else if (ECONNRESET == sock_error)
-        {
-            /* Connection reset */
-            DBG_I("sock(%d) error_ind: Connection reset\r\n", sock);
-        }
-        else if (ENOTCONN == sock_error)
-        {
-            /* Connection closed */
-            DBG_I("sock(%d) error_ind: Connection closed\r\n", sock);
-        }
-        break;
-    }
-    default:
-        break;
+
+        cJSON_Delete(cjson_whole);
+        cm_free(massgeQ);
     }
 }
 
-void Socket_Client_Thread(void* param)
+void MQTT_Client_Thread(void* param)
 {
-    MqttClientInfo mqttInfo = {
-        .mqttHost = mqttHost,
-        .productKey = productKey,
-        .deviceName = deviceName,
-        .deviceSecret = deviceSecret,
-        .pubTopic = pubTopic,
-        .subTopic = subTopic
-    };
-
-    MqttClient = MQTTCLIENT_CTOR();
-    
-
-    void* mqtt_handle = NULL;
     void* massgeQ = NULL;
+
+    MqttClientInfo mqttInfo = {
+        .mqttHost = "iot-06z00b0c4a5stcb.mqtt.iothub.aliyuncs.com",
+        .productKey = "a16bTikWROS",
+        .deviceName = "n001",
+        .deviceSecret = "f3640db1414c5883b7996ebdfb0eb958",
+        .pubTopic = "/a16bTikWROS/n001/user/cmdSend",
+        .subTopic = "/a16bTikWROS/n001/user/cmdRcv"
+    };
 
     my_network_io_init();
 
-    // while(SocketClient->init(SocketClient, info) != 0){
-    //     osDelayMs(1000);
-    // }
-
-    socket_send_queue = osMessageQueueNew(4, sizeof(void*), NULL);
-
-    osTimerStart(HeartBeat_Timer, 4000/5);
-    my_ntp_get();
-    while(ntpTemp == 0)
-    {
+    /* 连接mqtt前首先要同步ntp */
+	while(ntpTemp == 0){
         osDelayMs(1000);
+        my_ntp_get();
     }
-    // cm_test_aliyun();
-    MqttClient->init(MqttClient, mqttInfo);
 
-    osDelayMs(1000);
-
-    MQTTCLIENT_IMPLEMENTS *mqtt = (MQTTCLIENT_IMPLEMENTS*)MqttClient;
-
-    char *pub_payload = "{\"deviceType\":0,\"deviceId\":\"n001\",\"requestId\":\"wechat\",\"return\":{\"door\":\"open\"}}";
-    
-    mqtt->pub(mqtt, pub_payload, sizeof(pub_payload));
+    mqtt->init(MqttClient, mqttInfo);
     mqtt->sub(mqtt);
-    // my_aliyun_mqtt_connect(mqtt_handle);
+    
 
-    // while(mqttTemp == 0)
-    // {
-    //     osDelayMs(1000);
-    // }
+    mqtt_send_queue = osMessageQueueNew(4, sizeof(void*), NULL);
 
-    // my_topic_pub(mqtt_handle);
+    // osTimerStart(HeartBeat_Timer, 4000/5);
     
     while(1){
-        osMessageQueueGet(socket_send_queue, &massgeQ, 0, osWaitForever);
-        // socketCtrl->ssend(SocketClient, massgeQ, 10);
+        osMessageQueueGet(mqtt_send_queue, &massgeQ, 0, osWaitForever);
+        mqtt->pub(mqtt, massgeQ, strlen(massgeQ));
+        cm_free(massgeQ);
     }
 }
 
