@@ -222,6 +222,7 @@ void MQTT_RECV_Handle(void* param)
     cJSON* cjson_request = NULL;
     cJSON* cjson_commend = NULL;
     cJSON* cjson_item = NULL;
+    bool ledState = 0;
 
     mqtt_recv_queue = osMessageQueueNew(4, sizeof(void*), NULL);
 
@@ -234,7 +235,15 @@ void MQTT_RECV_Handle(void* param)
         if(cjson_commend){
             cjson_item = cJSON_GetObjectItem(cjson_commend, "door");
             if(cjson_item){
-                DBG_W("door: %s\r\n", cjson_item->valuestring);    
+                DBG_W("door: %s\r\n", cjson_item->valuestring);
+                if(ledState){
+                    my_ringtone_play(MP3_CLOSELOCK_PATH);
+                }else{
+                    my_ringtone_play(MP3_OPENCLOK_PATH);
+                }
+                my_run_io_sw(ledState);
+                my_network_io_sw(!ledState);
+                ledState = !ledState;
             }
         }
 
@@ -254,7 +263,7 @@ void MQTT_RECV_Handle(void* param)
 
             void* msg = cm_malloc(sizeof(15));
             msg = (void*)cJSON_PrintUnformatted(root);
-            
+
             osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
 
             cJSON_Delete(root);
