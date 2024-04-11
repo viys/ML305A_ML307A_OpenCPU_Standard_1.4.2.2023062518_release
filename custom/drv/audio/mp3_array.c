@@ -34,7 +34,7 @@ void my_amr_load_files(void)
     /*将要用到的音频文件载入文件系统*/
 	ret += load_amr_file(linknet_mp3, ARRAY_SIZE(linknet_mp3), MP3_LINKNET_PATH);
 	ret += load_amr_file(callstart_mp3, ARRAY_SIZE(callstart_mp3), MP3_CALLSTART_PATH);
-	ret += load_amr_file(openlock_mp3, ARRAY_SIZE(openlock_mp3), MP3_OPENCLOK_PATH);
+	ret += load_amr_file(openlock_mp3, ARRAY_SIZE(openlock_mp3), MP3_OPENLOCK_PATH);
 	ret += load_amr_file(closelock_mp3, ARRAY_SIZE(closelock_mp3), MP3_CLOSELOCK_PATH);
     if(ret == 0)DBG_I("All mp3 write successed\r\n");
 }

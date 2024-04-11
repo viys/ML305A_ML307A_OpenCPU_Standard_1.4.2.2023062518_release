@@ -1,10 +1,10 @@
-#ifndef __APP_H
-#define __APP_H
+#pragma once
 
 #include "includes.h"
 #include "drv_uart.h"
 #include "mqtt_client.h"
 #include "transceiver.h"
+#include "sywm033.h"
 
 #define FlagSET(Flag,bit)	(Flag |= (bit))		//Flag置位
 #define FlagCLR(Flag,bit)	(Flag &= ~(bit))	//Flag清位
@@ -20,6 +20,8 @@ extern osSemaphoreId_t u0_uart_sem;
 extern osSemaphoreId_t button_sem;
 
 extern osMessageQueueId_t button_click_queue;
+extern osMessageQueueId_t fp_uart_queue;
+extern osMessageQueueId_t lock_queue;
 extern osMessageQueueId_t transceiver_queue;
 extern osMessageQueueId_t mqtt_send_queue;
 osMessageQueueId_t mqtt_recv_queue;
@@ -29,6 +31,9 @@ extern TRANSCEIVER_IMPLEMENTS* phone;
 
 extern MQTTCLIENT* MqttClient;
 extern MQTTCLIENT_IMPLEMENTS* mqtt;
+
+extern FINGERPRINT* Fingerprint;
+extern FINGERPRINT_IMPLEMENTS* fp;
 
 /* 定时器 */
 osTimerId_t TASK_TT;
@@ -62,11 +67,11 @@ osTimerId_t osTimerCreat(const char * name,osTimerFunc_t func,osTimerType_t type
 void osDelayMs(uint32_t ms);
 
 /**
- * @brief AT 测试进程
+ * @brief RTC进程（可阻塞）
  * 
  * @param argument 
  */
-void dbg_th(void* argument);
+void RTC_Count_Task(void* argument);
 
 /**
  * @brief 启动函数
@@ -104,10 +109,16 @@ void MQTT_Client_Thread(void* param);
 void MQTT_RECV_Handle(void* param);
 
 /**
+ * @brief 指纹接收线程
+ * 
+ * @param param 
+ */
+void FP_RECV_Handle(void* param);
+void LOCK_Handle(void* param);
+
+/**
  * @brief 心跳定时器
  * 
  * @param param 
  */
 void Heart_Beat_Timer(void* param);
-
-#endif // !__APP_H

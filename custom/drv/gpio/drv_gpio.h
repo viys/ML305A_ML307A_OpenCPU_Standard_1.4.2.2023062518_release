@@ -51,7 +51,7 @@ extern osMessageQueueId_t call_io_queue;
  * @return int  = 0 - 成功 \n
  *    < 0 - 失败, 返回值为错误码
  */
-int my_io_init(void);
+int my_button_io_init(void);
 /**
  * @brief 继电器开关函数
  * 
@@ -109,5 +109,64 @@ int my_run_io_sw(uint8_t level);
 
 int my_network_io_init(void);
 int my_network_io_sw(uint8_t level);
+
+/**
+ * @brief 指纹模块gpio初始化
+ * 
+ * @return int 
+ */
+int my_fp_gpio_init(void);
+cm_gpio_level_e my_fp_int_get(void);
+int my_io_init_2(cm_gpio_num_e num, cm_iomux_pin_e pin, cm_gpio_cfg_t cfg, cm_iomux_func_e fun_num);
+
+/**
+ * @brief 指纹模块使能与失能切换
+ * 
+ * @param level 
+ * @return int 
+ */
+int my_fp_en_sw(cm_gpio_level_e level);
+
+/**
+ * @brief 指纹模块使能获取函数
+ * 
+ * @return cm_gpio_level_e 
+ */
+cm_gpio_level_e my_fp_en_get(void);
+
+/**
+ * @brief GPIO初始化函数
+ * 
+ * @param num 
+ * @param pin 
+ * @param cfg 
+ * @return int 
+ */
+int my_io_init(cm_gpio_num_e num, cm_iomux_pin_e pin, cm_gpio_cfg_t cfg);
+
+/**
+ * @brief IO去初始化函数
+ * 
+ * @param num 
+ * @return int 
+ */
+int my_io_deinit(cm_gpio_num_e num);
+
+/**
+ * @brief IO电平设置函数
+ * 
+ * @param num 
+ * @param level 
+ * @return int 
+ */
+int my_io_sw(cm_gpio_num_e num, cm_gpio_level_e level);
+
+/**
+ * @brief IO电平获取函数
+ * 
+ * @param num 
+ * @return cm_gpio_level_e 
+ */
+cm_gpio_level_e my_io_get(cm_gpio_num_e num);
 
 #endif // !__DRV_GPIO_H

@@ -18,7 +18,7 @@ extern const unsigned char linknet_mp3[2592];
 #define MP3_CALLSTART_PATH "callstart.mp3"
 extern const unsigned char callstart_mp3[2088];
 /* 开门语音 */
-#define MP3_OPENCLOK_PATH "openlock.mp3"
+#define MP3_OPENLOCK_PATH "openlock.mp3"
 extern const unsigned char openlock_mp3[1224];
 /* 锁门语音 */
 #define MP3_CLOSELOCK_PATH "closelock.mp3"

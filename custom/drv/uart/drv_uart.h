@@ -96,6 +96,9 @@ void uart_open(cm_uart_dev_e dev,int baudrate,void* callback);
  */
 void u0_callback(void *param, uint32_t type);
 
+void u1_callback(void *param, uint32_t type);
+void u1_printf(char *str, ...);
+
 /**
  * @brief 串口0 Printf函数
  * 

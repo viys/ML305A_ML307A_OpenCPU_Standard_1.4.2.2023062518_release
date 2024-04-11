@@ -6,6 +6,7 @@
 #include "app.h"
 
 static char txBuff0[256];
+static char txBuff1[256];
 char rxBuff[256];
 unsigned log_num = 0;
 
@@ -14,7 +15,26 @@ void u0_callback(void *param, uint32_t type)
 
 	if(CM_UART_EVENT_TYPE_RX_ARRIVED & type){
     /* 接收到新的数据  */
-        osSemaphoreRelease(u0_uart_sem);
+        // osSemaphoreRelease(u0_uart_sem);
+        // void* msg = cm_malloc(64);
+        // cm_uart_read(CM_UART_DEV_0, (void*)msg, 256, 1000);
+        // osMessageQueuePut(fp_uart_queue, &msg, 0, 0);
+
+    }else if(CM_UART_EVENT_TYPE_RX_OVERFLOW & type){
+    /* 接收FIFO缓存溢出 */
+    
+    }
+    
+}
+
+void u1_callback(void *param, uint32_t type)
+{
+
+	if(CM_UART_EVENT_TYPE_RX_ARRIVED & type){
+    /* 接收到新的数据  */
+        void* msg = cm_malloc(64);
+        cm_uart_read(CM_UART_DEV_1, (void*)msg, 256, 1000);
+        osMessageQueuePut(fp_uart_queue, &msg, 0, 0);
 
     }else if(CM_UART_EVENT_TYPE_RX_OVERFLOW & type){
     /* 接收FIFO缓存溢出 */
@@ -79,6 +99,22 @@ void u0_printf(char *str, ...)
     len = vsnprintf((char*)txBuff0,256,str,args);
     va_end(args);
     cm_uart_write(CM_UART_DEV_0,txBuff0,len,1000);
+}
+
+void u1_printf(char *str, ...)
+{
+    va_list args;
+    int len;
+    
+    if((str == NULL) || (strlen(str) == 0))
+    {
+        return;
+    }
+
+    va_start (args,str);
+    len = vsnprintf((char*)txBuff1,256,str,args);
+    va_end(args);
+    cm_uart_write(CM_UART_DEV_1,txBuff1,len,1000);
 }
 
 int u0_uart_read(char* data)

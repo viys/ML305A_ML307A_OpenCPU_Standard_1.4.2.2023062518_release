@@ -93,14 +93,17 @@ int battery_update_level(void* t)
 int battery_get_level(void* t)
 {
     BATTERY* this = (BATTERY*)t;
-    
-    return this->info.level;
+    if(this->info.level<0){
+        return -1;
+    }else{
+        return this->info.level;
+    }
 }
 
 BATTERY* BATTERY_CTOR(void)
 {
     BATTERY *this = (BATTERY*)malloc(sizeof(BATTERY));
-    this->init = battery_init;
+    this->interface.init = battery_init;
     this->interface.update_level = battery_update_level;
     this->interface.get_level = battery_get_level;
     return (BATTERY*)this;

@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "drv_socket.h"
 #include "drv_uart.h"
+#include "cJSON.h"
 
 #define DBG_NAME "socket"
 
@@ -42,7 +43,7 @@ int socket_send(void* t, char* data, int len)
 
 SOCKETSERVER* SOCKETSERVER_CTOR(void)
 {
-    SOCKETSERVER *this = (SOCKETSERVER*)malloc(sizeof(SOCKETSERVER));
+    SOCKETSERVER *this = (SOCKETSERVER*)cm_malloc(sizeof(SOCKETSERVER));
     this->init = socket_init;
     this->interface.receive = socket_receive;
     this->interface.ssend = socket_send;
@@ -51,6 +52,8 @@ SOCKETSERVER* SOCKETSERVER_CTOR(void)
 
 void SOCKETSERVER_DTOR(SOCKETSERVER* t)
 {
-    free(t);
+    cm_free(t);
 }
+
+
 

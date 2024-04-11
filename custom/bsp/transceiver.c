@@ -217,7 +217,7 @@ int transceiver_press_red(void* t)
     case TRANSCEIVER_INCOMING:
         DBG_F("Reject incoming call\r\n");
         this->reject(this);
-        this->ring(this, MP3_OPENCLOK_PATH);
+        this->ring(this, MP3_OPENLOCK_PATH);
         ret = 0;
         break;
     default:

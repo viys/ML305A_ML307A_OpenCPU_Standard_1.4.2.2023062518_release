@@ -20,6 +20,7 @@ typedef struct{
 }BatteryInfo;
 
 typedef struct{
+    int (*init)(void*);
     int (*update_level)(void*);
     int (*get_level)(void*);
 }BATTERY_IMPLEMENTS;
@@ -27,7 +28,6 @@ typedef struct{
 typedef struct{
     BATTERY_IMPLEMENTS interface;
     BatteryInfo info;
-    int (*init)(void*);
 }BATTERY;
 
 BATTERY* BATTERY_CTOR(void);

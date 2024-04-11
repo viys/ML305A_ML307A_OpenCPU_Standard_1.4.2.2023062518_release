@@ -1,4 +1,7 @@
+#include "sys.h"
 #include "app.h"
+#include "cm_pm.h"
+#include "cm_mem.h"
 #include "drv_uart.h"
 #include "drv_virt_at.h"
 #include "button.h"
@@ -11,8 +14,8 @@
 #include "battery.h"
 #include "drv_ntp.h"
 #include "drv_mqtt.h"
-#include "mqtt_client.h"
 #include "cJSON.h"
+#include "motor.h"
 
 #define DBG_NAME "app"
 
@@ -23,49 +26,66 @@ SOCKETSERVER* SocketClient = NULL;
 
 // INTERCOM 
 
-void dbg_th(void* argument)
+void LOCK_Handle(void* param)
 {
-    
+    char* massgeQ = NULL;
+    LOCK* Lock = LOCK_CTOR();
+    Lock->init(Lock);
+    LOCK_IMPLEMENTS* lock = (LOCK_IMPLEMENTS*)Lock;
 
+    lock_queue = osMessageQueueNew(4, sizeof(void*), NULL);
+    while(1){
+        osMessageQueueGet(lock_queue, &massgeQ, 0, osWaitForever);
+        switch(massgeQ[0])
+        {
+        case 0x01:
+            lock->open(lock);
+            break;
+        case 0x02:
+            lock->close1(lock);
+            break;
+        default:
+            break;
+        }
+        cm_free(massgeQ);
+    }
+}
+
+void FP_RECV_Handle(void* param)
+{
+    void* massgeQ = NULL;
+    char* temp = NULL;
+    fp->init(fp);
+    uart_open(CM_UART_DEV_1, 57600, u1_callback);
+    fp_uart_queue = osMessageQueueNew(4, sizeof(void*), NULL);
+    while(1){
+        osMessageQueueGet(fp_uart_queue, &massgeQ, 0, osWaitForever);
+        if(((char*)massgeQ)[0] == 0xAA){
+            // u1_printf("hello\r\n");
+            fp->enable(fp, 1);
+        }else{
+            DBG_F("uart1: %s\r\n", massgeQ);
+            fp->identify(fp);
+        }
+        cm_free(massgeQ);
+    }
+}
+
+void RTC_Count_Task(void* argument)
+{
+    Battery = BATTERY_CTOR();
+    BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;    
+    batteryCtrl->init(Battery);
 
     while(1){
-        // mqtt->pub(mqtt, (char*)pubTopic, sizeof(pubTopic));
-        osDelayMs(1000);
+        for(int i=0; i<4; i++){
+            /* 充电时可以高速检测 */
+            osDelayMs(200);
+            Battery->interface.update_level(Battery);
+        }
+        osDelayMs(200);
+        DBG_I("Bat %d\r\n", Battery->interface.get_level(Battery));
     }
-    
-    // int ret = 0;
-    // /*串口由于LOG功能,已在cm_opencpu_entry()开头初始化*/
-    // int readLen = 0 ;
-    // /* 创建信号量 */
-	// u0_uart_sem = osSemaphoreNew(1, 0, NULL);
-    // DBG_F("hmi_uart_sem ID: %d\r\n", u0_uart_sem);
-    
-    // // while(1){
-    //     // ret = cm_test_ntp();
-    // //     DBG_W("ret: %d", ret);
-    // //     if(ret != 0) break;
-    // //     osDelayMs(400);
-    // // }
-
-    // // cm_test_aliyun();
-    // // while(cm_test_ntp() != 0){
-    // //     osDelayMs(400);
-    // // }
-    
-    // while(1){
-    //     #if 0
-    //     osSemaphoreAcquire(u0_uart_sem, osWaitForever);
-    //     readLen = u0_uart_read(rxBuff);
-    //     my_virt_at_test((unsigned char*)rxBuff, strlen(rxBuff));
-    //     u0_printf("Send %s (%d)\r\n",rxBuff , readLen);
-    //     #else
-    //     /* 充电时可以高速检测 */
-    //     osDelayMs(1000);
-    //     // Battery->interface.update_level(Battery);
-    //     // u0_printf("%d\n", Battery->interface.get_level(Battery));
-    //     // // u0_printf("%d\n", Battery->interface.update_level(Battery));
-    //     #endif
-    // }
 }
 
 void my_button_callback(void){
@@ -116,8 +136,6 @@ void Button_Click_Thread(void* param)
     }
 }
 
-
-
 static void my_record_cb(cm_audio_record_event_e event, void *param)
 {
     /* 通知事件为中断触发，不可阻塞，不可做耗时较长的操作，例如不可使用UART打印log */
@@ -152,67 +170,6 @@ static void my_player_cb(cm_audio_play_event_e event, void *param)
     }
 }
 
-
-void Transceiver_Thread(void* param)
-{
-    void* massgeQ = NULL;
-
-    TransceiverCfg cfg =  {
-        .imei = "123456789012345",
-        .imsi = "12345678901234567890",
-        .targt.imei = "2234567890",
-        .player_cb = my_player_cb,
-        .record_cb = my_record_cb,
-        .volume = 100,
-        .gain = 0,
-    };
-
-    Transceiver->init(Transceiver, cfg);
-    my_audio_io_sw(1);
-    phone->online(Transceiver);
-
-    transceiver_queue = osMessageQueueNew(4, sizeof(void*), NULL);
-    Battery = BATTERY_CTOR();
-    Battery->init(Battery);
-    BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;    
-
-    while(1)
-    {
-        osMessageQueueGet(transceiver_queue, &massgeQ, 0, osWaitForever);
-        switch(((uint8_t*)massgeQ)[0])
-        {
-        case PHONE_PRESS_GREEN:
-            DBG_F("press green\r\n");
-            phone->press_green(Transceiver);
-            break;
-        case PHONE_PRESS_RED:
-            DBG_F("press red\r\n");
-            phone->press_red(Transceiver);
-            break;
-        case PHONE_INCOMING:
-            phone->incoming(Transceiver);
-            break;
-        case PHONE_SET_TARGET:{
-            TargetInfo info;
-            memcpy(&info, massgeQ+1, sizeof(TargetInfo));
-            phone->set_targt(Transceiver, info);
-            break;
-        }
-        case PHONE_RECORD_SEND:
-            
-            break;
-        case PHONE_RECORD_RECV:
-
-            break;
-        default:
-            break;
-        }
-        cm_free(massgeQ);
-        screen_display(Transceiver);
-    }
-    
-}
-
 void MQTT_RECV_Handle(void* param)
 {
     void* massgeQ = NULL;
@@ -226,6 +183,8 @@ void MQTT_RECV_Handle(void* param)
 
     mqtt_recv_queue = osMessageQueueNew(4, sizeof(void*), NULL);
 
+    bdr_motor_init();
+
     while(1){
         osMessageQueueGet(mqtt_recv_queue, &massgeQ, 0, osWaitForever);
 
@@ -235,11 +194,25 @@ void MQTT_RECV_Handle(void* param)
         if(cjson_commend){
             cjson_item = cJSON_GetObjectItem(cjson_commend, "door");
             if(cjson_item){
-                DBG_W("door: %s\r\n", cjson_item->valuestring);
+                // switch(strcmp(cjson_item->valuestring)){
+                // case "open":
+                //     my_ringtone_play(MP3_CLOSELOCK_PATH);
+                //     break;
+                // case "close":
+                //     break;
+                
+                // }
+                DBG_W("door: \r\n");
                 if(ledState){
                     my_ringtone_play(MP3_CLOSELOCK_PATH);
+                    void* msg = cm_malloc(1);
+                    ((uint8_t*)msg)[0] = 0x02; //对应通道宏定义
+                    osMessageQueuePut(lock_queue, &msg, 0, 0);
                 }else{
-                    my_ringtone_play(MP3_OPENCLOK_PATH);
+                    my_ringtone_play(MP3_OPENLOCK_PATH);
+                    void* msg = cm_malloc(1);
+                    ((uint8_t*)msg)[0] = 0x01; //对应通道宏定义
+                    osMessageQueuePut(lock_queue, &msg, 0, 0);
                 }
                 my_run_io_sw(ledState);
                 my_network_io_sw(!ledState);
@@ -277,6 +250,7 @@ void MQTT_RECV_Handle(void* param)
 void MQTT_Client_Thread(void* param)
 {
     void* massgeQ = NULL;
+    int temp = 0;
 
     MqttClientInfo mqttInfo = {
         .mqttHost = "iot-06z00b0c4a5stcb.mqtt.iothub.aliyuncs.com",
@@ -287,21 +261,43 @@ void MQTT_Client_Thread(void* param)
         .subTopic = "/a16bTikWROS/n001/user/cmdRcv"
     };
 
+    TransceiverCfg cfg =  {
+        .imei = "123456789012345",
+        .imsi = "12345678901234567890",
+        .targt.imei = "2234567890",
+        .player_cb = my_player_cb,
+        .record_cb = my_record_cb,
+        .volume = 100,
+        .gain = 0,
+    };
+
+    Transceiver->init(Transceiver, cfg);
+    my_audio_io_sw(1);
+    phone->online(Transceiver);
+
+    transceiver_queue = osMessageQueueNew(4, sizeof(void*), NULL);
+    Battery = BATTERY_CTOR();
+    BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;    
+    batteryCtrl->init(Battery);
+
     my_network_io_init();
 
     /* 连接mqtt前首先要同步ntp */
+    my_ntp_get();
+    osDelayMs(1000);
 	while(ntpTemp == 0){
-        osDelayMs(1000);
+        if(temp >= 50){
+            cm_pm_reboot();
+        }
+        ++ temp;
         my_ntp_get();
+        osDelayMs(1000);
     }
 
     mqtt->init(MqttClient, mqttInfo);
     mqtt->sub(mqtt);
-    
 
     mqtt_send_queue = osMessageQueueNew(4, sizeof(void*), NULL);
-
-    // osTimerStart(HeartBeat_Timer, 4000/5);
     
     while(1){
         osMessageQueueGet(mqtt_send_queue, &massgeQ, 0, osWaitForever);
@@ -312,7 +308,6 @@ void MQTT_Client_Thread(void* param)
 
 void Heart_Beat_Timer(void* param)
 {
-    Battery->interface.update_level(Battery);
 }
 
 osThreadId_t osThreadCreat(const char * name,osThreadFunc_t func,osPriority_t priority,uint32_t stacksize)

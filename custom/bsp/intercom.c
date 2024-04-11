@@ -55,7 +55,7 @@ int intercom_ring_play(void* t)
         my_ring_play(MP3_LINKNET_PATH, this->cfg.player_cb);
         break;
     case TRANSCEIVER_HANGUP:
-        my_ring_play(MP3_OPENCLOK_PATH, this->cfg.player_cb);
+        my_ring_play(MP3_OPENLOCK_PATH, this->cfg.player_cb);
         break;
     case TRANSCEIVER_TIMEOUT:
         my_ring_play(MP3_LINKNET_PATH, this->cfg.player_cb);
