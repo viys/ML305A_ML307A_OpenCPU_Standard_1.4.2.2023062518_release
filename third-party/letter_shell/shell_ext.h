@@ -13,6 +13,7 @@
 #define __SHELL_EXT_H__
 
 #include "shell.h"
+#include "cm_mem.h"
 
 /**
  * @brief 数字类型

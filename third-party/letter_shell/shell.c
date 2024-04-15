@@ -14,6 +14,7 @@
 #include "stdio.h"
 #include "stdarg.h"
 #include "shell_ext.h"
+#include "cm_os.h"
 
 
 #if SHELL_USING_CMD_EXPORT == 1
@@ -1889,6 +1890,7 @@ void shellTask(void *param)
         {
             shellHandler(shell, data);
         }
+        osDelay(2);
 #if SHELL_TASK_WHILE == 1
     }
 #endif

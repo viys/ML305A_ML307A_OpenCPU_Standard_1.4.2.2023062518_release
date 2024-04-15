@@ -16,6 +16,8 @@
 #include "sys.h"
 #include "sywm033.h"
 #include "cm_pm.h"
+#include "shell_port.h"
+#include "shell.h"
 
 osThreadId_t ThreadI_DT;   // 线程ID标识
 osThreadAttr_t THREAD_CFG; // 线程配置结构体
@@ -46,7 +48,8 @@ FINGERPRINT_IMPLEMENTS* fp = NULL;
 int cm_opencpu_entry(char *param)
 {
 	uart_open(LOG_UART, 921600, u0_callback);
-	u0_printf("ML307A Start\r\n");
+	userShellInit();
+	// u0_printf("ML307A Start\r\n");
 
 	my_run_io_init();
 	my_run_io_sw(1);
@@ -67,12 +70,13 @@ int cm_opencpu_entry(char *param)
 	// osThreadCreat("click", Button_Click_Thread, 7, 1024);
 
 	/* 创建Transceiver进程 */
-	osThreadCreat("test_rcv_handle", Test_RECV_Handle, 9, 1024);
+	// osThreadCreat("test_rcv_handle", Test_RECV_Handle, 9, 1024);
 	osThreadCreat("RTC_Count", RTC_Count_Task, 4, 1024);
-	// osThreadCreat("mqtt_rcv_handle", MQTT_RECV_Handle, 6, 1024*2);
-	// osThreadCreat("lock_handle", LOCK_Handle, 8, 1024);
+	osThreadCreat("mqtt_rcv_handle", MQTT_RECV_Handle, 6, 1024*2);
+	osThreadCreat("lock_handle", LOCK_Handle, 8, 1024);
 	osThreadCreat("fp_rcv_handle", FP_RECV_Handle, 7, 1024);
-	// osThreadCreat("mqtt_client", MQTT_Client_Thread, 5, 1024*4);
+	osThreadCreat("mqtt_client", MQTT_Client_Thread, 5, 1024*4);
+
 
 	
 	return 0;
