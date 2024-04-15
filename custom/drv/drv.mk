@@ -28,6 +28,10 @@ INC      += -I'$(DRV_UART_DIR)/mqtt'
 OC_FILES +=  $(DRV_UART_DIR)/ntp/drv_ntp.c
 INC      += -I'$(DRV_UART_DIR)/ntp'
 
+#shell
+OC_FILES +=  $(DRV_UART_DIR)/shell/drv_shell.c
+INC      += -I'$(DRV_UART_DIR)/shell'
+
 #audio
 OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_array.c
 OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_linknet.c

@@ -20,6 +20,7 @@ extern osSemaphoreId_t u0_uart_sem;
 extern osSemaphoreId_t button_sem;
 
 extern osMessageQueueId_t button_click_queue;
+extern osMessageQueueId_t test_uart_queue;
 extern osMessageQueueId_t fp_uart_queue;
 extern osMessageQueueId_t lock_queue;
 extern osMessageQueueId_t transceiver_queue;
@@ -72,6 +73,8 @@ void osDelayMs(uint32_t ms);
  * @param argument 
  */
 void RTC_Count_Task(void* argument);
+
+void Test_RECV_Handle(void* argument);
 
 /**
  * @brief 启动函数

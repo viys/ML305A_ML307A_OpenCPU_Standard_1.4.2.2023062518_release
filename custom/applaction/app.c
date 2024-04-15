@@ -53,19 +53,19 @@ void LOCK_Handle(void* param)
 
 void FP_RECV_Handle(void* param)
 {
-    void* massgeQ = NULL;
+    char* massgeQ = NULL;
     char* temp = NULL;
+    FingerprintParam fpParam;
     fp->init(fp);
     uart_open(CM_UART_DEV_1, 57600, u1_callback);
     fp_uart_queue = osMessageQueueNew(4, sizeof(void*), NULL);
     while(1){
         osMessageQueueGet(fp_uart_queue, &massgeQ, 0, osWaitForever);
-        if(((char*)massgeQ)[0] == 0xAA){
-            // u1_printf("hello\r\n");
+        if(massgeQ[0] == 0xAA){
+            fp->touch(fp);
             fp->enable(fp, 1);
         }else{
-            DBG_F("uart1: %s\r\n", massgeQ);
-            fp->identify(fp);
+            fp->data_handle(fp, massgeQ);
         }
         cm_free(massgeQ);
     }
@@ -84,7 +84,7 @@ void RTC_Count_Task(void* argument)
             Battery->interface.update_level(Battery);
         }
         osDelayMs(200);
-        DBG_I("Bat %d\r\n", Battery->interface.get_level(Battery));
+        // DBG_I("Bat %d\r\n", Battery->interface.get_level(Battery));
     }
 }
 

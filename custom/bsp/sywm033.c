@@ -658,13 +658,13 @@ static void fp_tick_count(void* t)
         ++ this->tick.lockoutTime;
         if(this->tick.lockoutTime >= FP_LOCK_TIME_MAX){
             /* 清除异常 */
-            this->interface.clear_abnormal(this);
+            this->api.clear_abnormal(this);
         }
     }else{
         ++ this->tick.workTime;
         if(this->tick.workTime >= FP_WORK_TIME_MAX){
             /* 关闭指纹模块 */
-            this->interface.enable(this, 0);
+            this->api.enable(this, 0);
         }
     }
 }
@@ -702,6 +702,229 @@ static void fp_init(void* t)
     this->status = idle;
 }
 
+static int fp_rev_handle(void* t, char* data)
+{
+    FINGERPRINT* this = (FINGERPRINT*)t;
+    FingerprintParam param;
+	
+	switch(this->api.get_status(this))
+	{
+	case vfyPwd:
+		switch(this->api.vfy_pwd_back(this, data))
+		{
+		case 0:
+			//口令正确
+			DBG_F("VfyPwd success\r\n");
+            
+			// Event_post(fpSyncEvent, SP_FP_IDENTIFY);
+            this->api.identify(this);
+            
+			break;
+		case -1:
+			// Event_post(thisSyncEvent, SP_FP_SLEEP);
+			DBG_F("VfyPwd error sleep\r\n");
+            this->api.enable(this, 0);
+		default:
+			break;
+		}
+		break;
+
+	case identify:
+		switch(this->api.identify_back(this, data))
+        {
+		case -1:
+			/* 指纹错误 */
+			// Event_post(thisSyncEvent, SP_FP_SLEEP);
+			DBG_E("Identify err sleep\r\n");
+            osDelayMs(1000);
+            this->api.enable(this, 0);
+			break;
+		case 0:
+			/* 指纹正确 */
+			param = this->api.special_opt(this, "query", 0);
+            DBG_F("Indentify success (%d) sleep\r\n", param.id);
+            osDelayMs(1000);
+            /* 记录开锁人id和方式 */
+            /* 执行开锁动作 */
+            this->api.enable(this, 0);
+			break;
+		case 1:
+			break;
+		case 2:
+			/* 超时 */
+			DBG_F("Identify timeout sleep\r\n");
+            this->api.enable(this, 0);
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case idle:
+		DBG_F("%s idle", __FUNCTION__);
+		break;
+
+	// case cancel:
+	// 	DBG_F("%s cancel sleep", __FUNCTION__);
+	// 	// Event_post(thisSyncEvent, SP_FP_SLEEP);
+	// 	break;
+
+	// case ctrolLed:
+	// 	DBG_F("%s ctrolLed sleep", __FUNCTION__);
+	// 	// Event_post(thisSyncEvent, SP_FP_SLEEP);
+	// 	break;
+
+	case readIndex:
+		switch(this->api.read_index_back(this, data))
+		{
+		case 0:
+			/* 读成功 */
+            DBG_I("List:\r\n");
+            for(int i=0; i<255; i++){
+                DBG_I("[%d] ", i/16);
+                DBG_I("%d ", this->api.check_id(this, i));
+                if(i%16 == 15){
+                    DBG_I("\r\n");
+                }
+            }
+            DBG_I("\r\n");
+			DBG_F("ReadIndex success sleep\r\n");
+            this->api.enable(this, 0);
+			break;
+		case -1:
+			DBG_F("ReadIndex failed sleep\r\n");
+            this->api.enable(this, 0);
+			/* 读失败 */
+			// DBG_F("%s readIndex failed sleep", __FUNCTION__);
+			break;
+		default:
+			break;
+		}
+		// Event_post(thisSyncEvent, SP_FP_SLEEP);
+		break;
+
+	// case enroll:
+	// 	switch(this->apienroll_back(this, data)){
+	// 	case -1:
+	// 		/* 指纹录入失败 */
+	// 		DBG_F("%s enroll failed (%d)", __FUNCTION__, FpMod->lastOpt.id);
+	// 		// Event_post(thisSyncEvent, SP_FP_SLEEP);
+	// 		break;
+	// 	case 0:
+	// 		/* 指纹录入成功 */
+	// 		DBG_F("%s enroll success (%d)", __FUNCTION__, FpMod->lastOpt.id);
+	// 		// Event_post(thisSyncEvent, SP_FP_SLEEP);
+    //         FpMod->status = setPwd;
+    //         FpMod->info.pwd[0] = bleCode[0];
+	// 		FpMod->info.pwd[1] = bleCode[1];
+	// 		FpMod->info.pwd[2] = bleCode[2];
+	// 		FpMod->info.pwd[3] = bleCode[3];
+    //         this->apiset_pwd(this);
+	// 		thisStart = 0;
+	// 		// this->apiread_index(this);
+	// 		break;
+	// 	case 1:
+	// 		break;
+	// 	default:
+	// 		break;
+	// 	}
+	// 	break;
+
+	// case deletChar:
+	// 	switch(this->apidelete_back(this, data))
+	// 	{
+	// 	case 0:
+	// 		/* 删除成功 */
+	// 		DBG_F("%s deletChar success (%d)", __FUNCTION__, FpMod->lastOpt.id);
+	// 		break;
+	// 	case -1:
+	// 		/* 删除失败 */
+	// 		DBG_F("%s deletChar failed (%d)", __FUNCTION__, FpMod->lastOpt.id);
+	// 		break;
+	// 	default:
+	// 		DBG_F("%s deletChar default (0x%02x)", __FUNCTION__, data[9]);
+	// 		break;
+	// 	}
+	// 	DBG_F("read_index after delete");
+	// 	// this->apiread_index(this);
+	// 	Event_post(thisSyncEvent, SP_FP_SLEEP);
+	// 	thisStart = 0;
+	// 	// Event_post(thisSyncEvent, SP_FP_SLEEP);
+	// 	break;
+
+	// case setPwd:
+	// 	switch(this->apiset_pwd_back(this, data))
+	// 	{
+	// 	case -1:
+	// 		DBG_F("%s setPwd failed sleep", __FUNCTION__);
+	// 		break;
+	// 	case 0:
+	// 		DBG_F("%s setPwd success sleep", __FUNCTION__);
+	// 		break;
+	// 	default:
+	// 		break;
+	// 	}
+	// 	Event_post(thisSyncEvent, SP_FP_SLEEP);
+	// 	break;
+		
+	default:
+		break;
+	}
+	return 0;
+}
+
+static void fp_date_handle(void* t, char* data)
+{
+    FINGERPRINT* this = (FINGERPRINT*)t;
+    switch(this->api.unpack(this, data))
+    {
+    case 0:
+        if(this->api.get_status(this) != idle) break;
+        DBG_E("Protocol err! sleep\r\n");
+        break;
+    case 1:
+        /* 校验成功 */
+        DBG_F("FP[%d] handle get date\r\n", this->status);
+        fp_rev_handle(this, data);
+        break;
+    case 2:
+        /* 读到开机消息 */
+        switch(this->api.get_status(this))
+        {
+        case vfyPwd:
+            this->api.vfy_pwd(this);
+            break;
+        case enroll:
+            this->api.enroll(this);
+            break;
+        case deletChar:
+            DBG_E("start delete\r\n");
+            this->api.delete(this);
+            break;
+        case readIndex:
+            DBG_F("Read index\r\n");
+            this->api.read_index(this);
+            break;
+        case setPwd:
+            this->api.set_pwd(this);
+            break;
+        case idle:
+            DBG_E("FP ERR! sleep\r\n");
+            break;
+        case ctrolLed:
+            break;
+        case identify:
+            this->api.identify(this);
+            break;
+        default:
+            break;
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 FINGERPRINT* FINGERPRINT_CTOR(void)
 {
     FINGERPRINT *this = (FINGERPRINT*)cm_malloc(sizeof(FINGERPRINT));
@@ -711,43 +934,44 @@ FINGERPRINT* FINGERPRINT_CTOR(void)
     this->uart_init = fp_uart_init;  //指纹串口初始化
     this->uart_deinit = fp_uart_deinit;  //指纹串口去初始化
 
-    this->interface.init = fp_init;  //指纹模块初始化
-    this->interface.touch = fp_touch; //指纹触摸
-    this->interface.unpack = fp_unpack; //接收消息解包
-    this->interface.enable = fp_enable; //指纹模块使能
-    this->interface.get_status =fp_get_status; //获取指纹模块通讯状态
-    this->interface.special_opt = fp_special_opt; //指纹模块特殊操作（指纹删除和注册的异步数据保存和获取）
-    this->interface.check_id = fp_check_id; //检查该id是否被注册
-    this->interface.clear_abnormal = fp_clear_abnormal; //清除异常
-    this->interface.tick_count = fp_tick_count; //计时
-    this->interface.get_uart_state = fp_get_uart_state; //计时
+    this->api.data_handle = fp_date_handle;  //指纹模块返回数据处理函数
+    this->api.init = fp_init;  //指纹模块初始化
+    this->api.touch = fp_touch; //指纹触摸
+    this->api.unpack = fp_unpack; //接收消息解包
+    this->api.enable = fp_enable; //指纹模块使能
+    this->api.get_status =fp_get_status; //获取指纹模块通讯状态
+    this->api.special_opt = fp_special_opt; //指纹模块特殊操作（指纹删除和注册的异步数据保存和获取）
+    this->api.check_id = fp_check_id; //检查该id是否被注册
+    this->api.clear_abnormal = fp_clear_abnormal; //清除异常
+    this->api.tick_count = fp_tick_count; //计时
+    this->api.get_uart_state = fp_get_uart_state; //计时
 
-    this->interface.set_pwd = fp_set_pwd; //设置口令
-    this->interface.set_pwd_back = fp_set_pwd_back; //设置口令消息处理
+    this->api.set_pwd = fp_set_pwd; //设置口令
+    this->api.set_pwd_back = fp_set_pwd_back; //设置口令消息处理
 
-    this->interface.vfy_pwd = fp_vfy_pwd; //验证口令
-    this->interface.vfy_pwd_back = fp_vfy_pwd_back; //口令消息处理
+    this->api.vfy_pwd = fp_vfy_pwd; //验证口令
+    this->api.vfy_pwd_back = fp_vfy_pwd_back; //口令消息处理
 
-    this->interface.identify = fp_identify; //指纹验证
-    this->interface.identify_back = fp_identify_back; //指纹验证消息处理
+    this->api.identify = fp_identify; //指纹验证
+    this->api.identify_back = fp_identify_back; //指纹验证消息处理
 
-    this->interface.enroll = fp_enroll; //指纹注册
-    this->interface.enroll_back = fp_enroll_back; //指纹注册消息处理
+    this->api.enroll = fp_enroll; //指纹注册
+    this->api.enroll_back = fp_enroll_back; //指纹注册消息处理
     
-    this->interface.read_index = fp_read_index; //指纹读索引表
-    this->interface.read_index_back = fp_read_index_back; //指纹读索引表消息处理
+    this->api.read_index = fp_read_index; //指纹读索引表
+    this->api.read_index_back = fp_read_index_back; //指纹读索引表消息处理
 
-    this->interface.delete = fp_delete; //指纹删除
-    this->interface.delete_back = fp_delete_back; //指纹删除消息处理
+    this->api.delete = fp_delete; //指纹删除
+    this->api.delete_back = fp_delete_back; //指纹删除消息处理
 
-    this->interface.sleep = fp_sleep; //指纹模块休眠
-    this->interface.sleep_back = fp_sleep_back; //指纹模块休眠消息处理
+    this->api.sleep = fp_sleep; //指纹模块休眠
+    this->api.sleep_back = fp_sleep_back; //指纹模块休眠消息处理
 
-    this->interface.cancel = fp_canncel; //指纹模块行为取消
-    this->interface.cancel_back = fp_canncel_back; //指纹模块行为取消
+    this->api.cancel = fp_canncel; //指纹模块行为取消
+    this->api.cancel_back = fp_canncel_back; //指纹模块行为取消
 
-    this->interface.led_enable = fp_led_enable; //led使能与失能
-    this->interface.led_enable_back = fp_led_enable_back; //led使能与失能
+    this->api.led_enable = fp_led_enable; //led使能与失能
+    this->api.led_enable_back = fp_led_enable_back; //led使能与失能
 
     return (FINGERPRINT*)this;
 }

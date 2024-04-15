@@ -93,6 +93,7 @@ typedef struct
 }FingerprintMsg;
 
 typedef struct{
+    void (*data_handle)(void*, char*);               //指纹模块数据处理函数
     void (*init)(void*);                            //初始化指纹模块
     void (*touch)(void*);                               //指纹触摸
     int (*unpack)(void* t, char*);                      //接收消息解包
@@ -124,7 +125,7 @@ typedef struct{
 }FINGERPRINT_IMPLEMENTS;
 
 typedef struct{
-    FINGERPRINT_IMPLEMENTS interface;               //模块接口
+    FINGERPRINT_IMPLEMENTS api;               //模块接口
     FingerprintInfo info;                           //模块信息
     FingerprintTick tick;                           //定时器参数
     FingerprintMsg msg;                             //发送消息存储区
