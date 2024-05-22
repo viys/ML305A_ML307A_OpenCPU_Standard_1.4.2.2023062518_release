@@ -15,10 +15,10 @@ void u0_callback(void *param, uint32_t type)
 
 	if(CM_UART_EVENT_TYPE_RX_ARRIVED & type){
     /* 接收到新的数据  */
-        // osSemaphoreRelease(u0_uart_sem);
-        // void* msg = cm_malloc(64);
-        // cm_uart_read(CM_UART_DEV_0, (void*)msg, 256, 1000);
-        // osMessageQueuePut(test_uart_queue, &msg, 0, 0);
+//         osSemaphoreRelease(u0_uart_sem);
+         void* msg = cm_malloc(64);
+         cm_uart_read(CM_UART_DEV_0, (void*)msg, 256, 1000);
+         osMessageQueuePut(test_uart_queue, &msg, 0, 0);
 
     }else if(CM_UART_EVENT_TYPE_RX_OVERFLOW & type){
     /* 接收FIFO缓存溢出 */
@@ -33,7 +33,7 @@ void u1_callback(void *param, uint32_t type)
 	if(CM_UART_EVENT_TYPE_RX_ARRIVED & type){
     /* 接收到新的数据  */
         void* msg = cm_malloc(64);
-        cm_uart_read(CM_UART_DEV_1, (void*)msg, 256, 1000);
+        cm_uart_read(CM_UART_DEV_1, (void*)msg, 64, 1000);
         osMessageQueuePut(fp_uart_queue, &msg, 0, 0);
 
     }else if(CM_UART_EVENT_TYPE_RX_OVERFLOW & type){

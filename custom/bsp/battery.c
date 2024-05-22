@@ -1,18 +1,18 @@
 #include "battery.h"
-#include "drv_adc.h"
-#include "string.h"
 #include <stdlib.h>
+#include "drv_adc.h"
 #include "drv_uart.h"
+#include "string.h"
 
-#define DBG_NAME "battery"
+#define DBG_NAME    "battery"
 
 #define BUFFER_SIZE 5
-#define LEVELS 3
+#define LEVELS      3
 
 typedef struct {
-    long int buffer[BUFFER_SIZE];   // 存储样本数据的缓冲区
-    int index;                      // 当前样本的索引
-    int count;                      // 已存储的样本数量
+    long int buffer[BUFFER_SIZE];  // 存储样本数据的缓冲区
+    int index;                     // 当前样本的索引
+    int count;                     // 已存储的样本数量
 } MovingAverageFilter;
 
 // 初始化滤波器
@@ -50,67 +50,63 @@ long int update(MovingAverageFilter* filter, long int sample) {
 
 MovingAverageFilter batteryFilter;
 
-int battery_init(void* t)
-{
+int battery_init(void* t) {
     int ret = 0;
     BATTERY* this = (BATTERY*)t;
 
     initialize(&batteryFilter);
 
     this->interface.update_level(this);
-    
 
     return ret;
 }
 
-int battery_update_level(void* t)
-{
+int battery_update_level(void* t) {
     long int voltage = 0;
     BATTERY* this = (BATTERY*)t;
-    
+
     voltage = my_adc_get();
     this->info.voltage = update(&batteryFilter, voltage) * 4;
 
-    this->info.level = (int)((float)(this->info.voltage - BATTERY_CUTOFF_VOLTAGE) / (float)(BATTERY_FULL_VOLTAGE - BATTERY_CUTOFF_VOLTAGE) * 100);
-    
-    if(this->info.level >= BATTERY_CHARG_END_PER){
+    this->info.level =
+        (int)((float)(this->info.voltage - BATTERY_CUTOFF_VOLTAGE) /
+              (float)(BATTERY_FULL_VOLTAGE - BATTERY_CUTOFF_VOLTAGE) * 100);
+
+    if (this->info.level >= BATTERY_CHARG_END_PER) {
         /* 电池充电完成 */
         this->info.mode = BATTERY_CHARGED;
-    }else if(this->info.level >= BATTERY_CHARGING_PER){
+    } else if (this->info.level >= BATTERY_CHARGING_PER) {
         /* 电池充电中 */
         this->info.mode = BATTERY_CHARGING;
-    }else if(this->info.level >= BATTERY_SAVING_MODE_PER){
+    } else if (this->info.level >= BATTERY_SAVING_MODE_PER) {
         /* 电池充工作中 */
         this->info.mode = BATTERY_WORKING;
-    }else if(this->info.level < BATTERY_SAVING_MODE_PER){
+    } else if (this->info.level < BATTERY_SAVING_MODE_PER) {
         /* 电池省电中 */
         this->info.mode = BATTERY_SAVING_MODE;
-    }else{}
-    
+    } else {
+    }
+
     return this->info.level;
 }
 
-int battery_get_level(void* t)
-{
+int battery_get_level(void* t) {
     BATTERY* this = (BATTERY*)t;
-    if(this->info.level<0){
+    if (this->info.level < 0) {
         return -1;
-    }else{
+    } else {
         return this->info.level;
     }
 }
 
-BATTERY* BATTERY_CTOR(void)
-{
-    BATTERY *this = (BATTERY*)malloc(sizeof(BATTERY));
+BATTERY* BATTERY_CTOR(void) {
+    BATTERY* this = (BATTERY*)malloc(sizeof(BATTERY));
     this->interface.init = battery_init;
     this->interface.update_level = battery_update_level;
     this->interface.get_level = battery_get_level;
     return (BATTERY*)this;
 }
 
-void BATTERY_DTOR(BATTERY* t)
-{
+void BATTERY_DTOR(BATTERY* t) {
     free(t);
 }
-

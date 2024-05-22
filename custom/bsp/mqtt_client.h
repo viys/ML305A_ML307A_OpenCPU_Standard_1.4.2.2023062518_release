@@ -10,40 +10,35 @@
  */
 #pragma once
 
-typedef struct
-{
+typedef struct {
+    char* cmd;
+    void* msg;
+} Pub_Struct;
+
+typedef struct {
     char* mqttHost;
     char* productKey;
     char* deviceName;
     char* deviceSecret;
     char* pubTopic;
     char* subTopic;
-}MqttClientInfo;
+} MqttClientInfo;
 
-typedef enum
-{
-    IDLE = 0x00,
-    BUSY
-}MqttClientState;
+typedef enum { IDLE = 0x00, BUSY } MqttClientState;
 
-typedef struct
-{
+typedef struct {
     void (*init)(void*, MqttClientInfo);
     int (*pub)(void*, char*, int);
     int (*sub)(void*);
-}MQTTCLIENT_IMPLEMENTS;
+} MQTTCLIENT_IMPLEMENTS;
 
-
-typedef struct
-{
+typedef struct {
     MQTTCLIENT_IMPLEMENTS api;
     MqttClientInfo info;
     MqttClientState state;
     void (*rcv_handle)(void*, char*);
     void* handle;
-}MQTTCLIENT;
-
-
+} MQTTCLIENT;
 
 MQTTCLIENT* MQTTCLIENT_CTOR(void);
 void MQTTCLIENT_DTOR(MQTTCLIENT* t);

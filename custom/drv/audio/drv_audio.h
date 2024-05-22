@@ -1,10 +1,10 @@
 #pragma once
 
-#include "includes.h"
 #include "cm_audio_player.h"
 #include "cm_audio_recorder.h"
-#include "sys\types.h"
+#include "includes.h"
 #include "mp3_array.h"
+#include "sys\types.h"
 
 /* 语音 */
 /*
@@ -37,7 +37,7 @@ uint32_t my_audio_init(uint8_t volume, uint8_t gain);
  * @param path 铃声地址
  * @return int32_t 
  */
-int my_ringtone_play(const char *path);
+int my_ringtone_play(const char* path);
 
 /**
  * @brief 打开音频流传输
@@ -72,7 +72,8 @@ int my_push_audio_stream(char* data, int size);
  * @return int =  0 - 成功 \n
  *   = -1 - 失败
  */
-int my_record_start(void (*record_cb)(cm_audio_record_event_e event, void *param));
+int my_record_start(void (*record_cb)(cm_audio_record_event_e event,
+                                      void* param));
 
 /**
  * @brief 结束录音
@@ -80,7 +81,8 @@ int my_record_start(void (*record_cb)(cm_audio_record_event_e event, void *param
  */
 void my_record_stop(void);
 
-
 void my_audio_play_stop(void);
 
-int my_ring_play(const char *path, void (*player_callback)(cm_audio_play_event_e event, void *param));
+int my_ring_play(const char* path,
+                 void (*player_callback)(cm_audio_play_event_e event,
+                                         void* param));

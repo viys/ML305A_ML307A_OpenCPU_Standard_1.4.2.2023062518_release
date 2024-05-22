@@ -38,5 +38,6 @@ OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_linknet.c
 OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_callstart.c
 OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_openlock.c
 OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_closelock.c
+OC_FILES +=  $(DRV_UART_DIR)/audio/mp3_vfy_err.c
 OC_FILES +=  $(DRV_UART_DIR)/audio/drv_audio.c
 INC      += -I'$(DRV_UART_DIR)/audio'
