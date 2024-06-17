@@ -127,6 +127,10 @@ int my_io_init_2(cm_gpio_num_e num, cm_iomux_pin_e pin, cm_gpio_cfg_t cfg, cm_io
  */
 int my_fp_en_sw(cm_gpio_level_e level);
 
+int my_bell_gpio_init(void);
+
+cm_gpio_level_e my_bell_level_get(void);
+
 /**
  * @brief 指纹模块使能获取函数
  * 

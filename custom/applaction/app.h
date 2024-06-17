@@ -5,6 +5,8 @@
 #include "mqtt_client.h"
 #include "sywm033.h"
 #include "transceiver.h"
+#include "battery.h"
+#include "motor.h"
 
 #define FlagSET(Flag, bit) (Flag |= (bit))   // Flag置位
 #define FlagCLR(Flag, bit) (Flag &= ~(bit))  // Flag清位
@@ -35,6 +37,12 @@ extern MQTTCLIENT_IMPLEMENTS* mqtt;
 
 extern FINGERPRINT* Fingerprint;
 extern FINGERPRINT_IMPLEMENTS* fp;
+
+extern BATTERY* Battery;
+extern BATTERY_IMPLEMENTS* batteryCtrl;
+
+extern LOCK* Lock;
+extern LOCK_IMPLEMENTS* lock;
 
 /* 定时器 */
 osTimerId_t TASK_TT;

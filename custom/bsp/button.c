@@ -38,7 +38,7 @@ buttonStatus button_check(void* t) {
     buttonStatus ret = this->status;
 
     if (this->status != BUTTON_RELEASED) {
-        // DBG_F("Button is %d\r\n", this->status);
+         DBG_F("Button is %d\r\n", this->status);
     }
 
     this->status = BUTTON_RELEASED;

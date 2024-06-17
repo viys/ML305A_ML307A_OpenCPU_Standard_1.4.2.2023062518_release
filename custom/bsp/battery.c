@@ -99,11 +99,18 @@ int battery_get_level(void* t) {
     }
 }
 
+BatteryMode battery_get_mode(void* t) {
+    BATTERY* this = (BATTERY*)t;
+
+    return this->info.mode;
+}
+
 BATTERY* BATTERY_CTOR(void) {
     BATTERY* this = (BATTERY*)malloc(sizeof(BATTERY));
     this->interface.init = battery_init;
     this->interface.update_level = battery_update_level;
     this->interface.get_level = battery_get_level;
+    this->interface.get_mode = battery_get_mode;
     return (BATTERY*)this;
 }
 

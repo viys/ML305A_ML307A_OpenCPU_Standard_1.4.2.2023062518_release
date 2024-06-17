@@ -6,6 +6,7 @@
 #include "sys.h"
 #include "drv_audio.h"
 #include "app.h"
+#include "cJSON.h"
 
 #define DBG_NAME "fp"
 
@@ -718,11 +719,15 @@ static int fp_rev_handle(void* t, char* data) {
                     /* 指纹正确 */
                     param = this->api.special_opt(this, "query", 0);
                     DBG_F("Indentify success (%d) sleep\r\n", param.id);
+                    char mode[10];
+                    sprintf(mode, "fp:%d", param.id);
                     osDelayMs(200);
                     /* 记录开锁人id和方式 */
                     /* 执行开锁动作 */
                     DBG_F("Open door\r\n");
-                    my_ringtone_play(MP3_OPENLOCK_PATH);
+                    lock->load(lock, NULL, NULL, NULL);
+                    lock->load(lock, NULL, mode, NULL);
+//                    my_ringtone_play(MP3_OPENLOCK_PATH);
                     void* msg = cm_malloc(1);
                     ((uint8_t*)msg)[0] = 0x01;  // 对应通道宏定义
                     osMessageQueuePut(lock_queue, &msg, 0, 0);
@@ -799,6 +804,27 @@ static int fp_rev_handle(void* t, char* data) {
                     res.opt = "enroll";
                     res.results = "false";
                     res.id = this->lastOpt.id;
+                    {
+                        cJSON* root = cJSON_CreateObject();
+
+                        cJSON_AddStringToObject(root, "deviceId", "n001");
+                        cJSON_AddStringToObject(root, "requestId", "wechat");
+                        cJSON_AddBoolToObject(root, "deviceType", 0);
+
+                        cJSON* info = cJSON_CreateObject();
+                        cJSON_AddStringToObject(info, "fpOpt", "enroll");
+                        cJSON_AddNumberToObject(info, "fpID", res.id);
+                        cJSON_AddStringToObject(info, "fpRet", "false");
+
+                        cJSON_AddItemToObject(root, "deviceInfo", info);
+
+                        void* msg = cm_malloc(sizeof(64));
+                        msg = (void*)cJSON_PrintUnformatted(root);
+
+                        osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+                        cJSON_Delete(root);
+                    }
                     break;
                 case 0:
                     /* 指纹录入成功 */
@@ -818,6 +844,27 @@ static int fp_rev_handle(void* t, char* data) {
                     res.results = "true";
                     res.id = this->lastOpt.id;
                      this->api.read_index(this);
+                     {
+                         cJSON* root = cJSON_CreateObject();
+
+                         cJSON_AddStringToObject(root, "deviceId", "n001");
+                         cJSON_AddStringToObject(root, "requestId", "wechat");
+                         cJSON_AddBoolToObject(root, "deviceType", 0);
+
+                         cJSON* info = cJSON_CreateObject();
+                         cJSON_AddStringToObject(info, "fpOpt", "enroll");
+                         cJSON_AddNumberToObject(info, "fpID", res.id);
+                         cJSON_AddStringToObject(info, "fpRet", "true");
+
+                         cJSON_AddItemToObject(root, "deviceInfo", info);
+
+                         void* msg = cm_malloc(sizeof(64));
+                         msg = (void*)cJSON_PrintUnformatted(root);
+
+                         osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+                         cJSON_Delete(root);
+                     }
                     break;
                 case 1:
                     break;
@@ -834,6 +881,27 @@ static int fp_rev_handle(void* t, char* data) {
                     res.opt = "delete";
                     res.results = "ture";
                     res.id = this->lastOpt.id;
+                    {
+                        cJSON* root = cJSON_CreateObject();
+
+                        cJSON_AddStringToObject(root, "deviceId", "n001");
+                        cJSON_AddStringToObject(root, "requestId", "wechat");
+                        cJSON_AddBoolToObject(root, "deviceType", 0);
+
+                        cJSON* info = cJSON_CreateObject();
+                        cJSON_AddStringToObject(info, "fpOpt", "delete");
+                        cJSON_AddNumberToObject(info, "fpID", res.id);
+                        cJSON_AddStringToObject(info, "fpRet", "true");
+
+                        cJSON_AddItemToObject(root, "deviceInfo", info);
+
+                        void* msg = cm_malloc(sizeof(64));
+                        msg = (void*)cJSON_PrintUnformatted(root);
+
+                        osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+                        cJSON_Delete(root);
+                    }
                     break;
                 case -1:
                     /* 删除失败 */
@@ -891,6 +959,7 @@ static void fp_date_handle(void* t, char* data) {
 //                }
 //                DBG_UART("\r\n");
             } else {
+                osDelayMs(200);
                 DBG_E("Protocol err! sleep\r\n");
             }
             break;

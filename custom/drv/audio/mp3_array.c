@@ -41,6 +41,10 @@ void my_amr_load_files(void) {
                          MP3_CLOSELOCK_PATH);
     ret += load_amr_file(vfy_err_mp3, ARRAY_SIZE(vfy_err_mp3),
                          MP3_VFY_ERR_PATH);
+    ret += load_amr_file(open_failed_mp3, ARRAY_SIZE(open_failed_mp3),
+                         MP3_OPEN_FAILED_PATH);
+    ret += load_amr_file(close_failed_mp3, ARRAY_SIZE(close_failed_mp3),
+                         MP3_CLOSE_FAILED_PATH);
     if (ret == 0)
         DBG_I("All mp3 write successed\r\n");
 }

@@ -13,6 +13,7 @@
 #include "drv_uart.h"
 #include "app.h"
 #include "sys.h"
+#include "cJSON.h"
 
 #define DBG_NAME "gpio"
 
@@ -268,6 +269,38 @@ static void fp_int_irq_call_back(void)
     void* msg = cm_malloc(64);
     ((char*)msg)[0] = 0xAA;
     osMessageQueuePut(fp_uart_queue, &msg, 0, 0);
+}
+
+static void bell_int_irq_call_back(void) {
+        void* msg = cm_malloc(sizeof(1));
+        ((char*)msg)[0] = 0x01;
+
+        osMessageQueuePut(button_click_queue, &msg, 0, 0);
+}
+
+int my_bell_gpio_init(void) {
+    int ret = EOF;
+
+    cm_gpio_cfg_t intCfg ={
+
+        .direction = CM_GPIO_DIRECTION_INPUT,
+        .pull = CM_GPIO_PULL_UP
+    };
+
+    cm_iomux_set_pin_func(BELL_GPIO_PIN, CM_IOMUX_FUNC_FUNCTION2);
+    ret += cm_gpio_deinit(BELL_GPIO_NUM);
+    ret += cm_gpio_init(BELL_GPIO_NUM, &intCfg);
+    cm_gpio_interrupt_register(BELL_GPIO_NUM, bell_int_irq_call_back);
+    cm_gpio_interrupt_enable(BELL_GPIO_NUM, CM_GPIO_IT_EDGE_FALLING);
+
+    return ret;
+}
+
+cm_gpio_level_e my_bell_level_get(void)
+{
+    cm_gpio_level_e level;
+    cm_gpio_get_level(BELL_GPIO_NUM, &level);
+    return level;
 }
 
 int my_fp_gpio_init(void)

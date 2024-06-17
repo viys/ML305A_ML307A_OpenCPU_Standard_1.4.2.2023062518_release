@@ -18,6 +18,7 @@
 #include "sys.h"
 #include "sywm033.h"
 #include "transceiver.h"
+#include "battery.h"
 
 osThreadId_t ThreadI_DT;    // 线程ID标识
 osThreadAttr_t THREAD_CFG;  // 线程配置结构体
@@ -45,16 +46,19 @@ MQTTCLIENT_IMPLEMENTS* mqtt = NULL;
 FINGERPRINT* Fingerprint = NULL;
 FINGERPRINT_IMPLEMENTS* fp = NULL;
 
+BATTERY* Battery = NULL;
+BATTERY_IMPLEMENTS* batteryCtrl = NULL;
+
+LOCK* Lock = NULL;
+LOCK_IMPLEMENTS* lock = NULL;
+
 int cm_opencpu_entry(char* param) {
     uart_open(LOG_UART, 921600, u0_callback);
     //	userShellInit();
-    // u0_printf("ML307A Start\r\n");
+     u0_printf("ML307A Start\r\n");
 
-    my_run_io_init();
-    my_run_io_sw(1);
-
-    Transceiver = TRANSCEIVER_CTOR();
-    phone = (TRANSCEIVER_IMPLEMENTS*)Transceiver;
+//    my_run_io_init();
+//    my_run_io_sw(1);
 
     MqttClient = MQTTCLIENT_CTOR();
     mqtt = (MQTTCLIENT_IMPLEMENTS*)MqttClient;
@@ -62,18 +66,19 @@ int cm_opencpu_entry(char* param) {
     Fingerprint = FINGERPRINT_CTOR();
     fp = (FINGERPRINT_IMPLEMENTS*)Fingerprint;
 
+    Battery = BATTERY_CTOR();
+    batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;
+
     HeartBeat_Timer =
         osTimerCreat("HeartBeat", Heart_Beat_Timer, osTimerPeriodic);
     // osTimerStart(HeartBeat_Timer, 4000/5);
-    /* 创建进程 */
-    /* 创建Button进程 */
-    // osThreadCreat("click", Button_Click_Thread, 7, 1024);
 
-    /* 创建Transceiver进程 */
+    /* 创建进程 */
+    osThreadCreat("click", Button_Click_Thread, 7, 1024*2);
     osThreadCreat("test_rcv_handle", Test_RECV_Handle, 9, 1024);
-    osThreadCreat("RTC_Count", RTC_Count_Task, 4, 1024);
+    osThreadCreat("RTC_Count", RTC_Count_Task, 4, 1024*2);
     osThreadCreat("mqtt_rcv_handle", MQTT_RECV_Handle, 6, 1024 * 2);
-    osThreadCreat("lock_handle", LOCK_Handle, 8, 1024);
+    osThreadCreat("lock_handle", LOCK_Handle, 8, 1024*2);
     osThreadCreat("fp_rcv_handle", FP_RECV_Handle, 7, 1024 * 4);
     osThreadCreat("mqtt_client", MQTT_Client_Thread, 5, 1024 * 4);
 

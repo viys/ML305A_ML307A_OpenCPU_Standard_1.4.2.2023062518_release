@@ -23,6 +23,7 @@ typedef struct {
     int (*init)(void*);
     int (*update_level)(void*);
     int (*get_level)(void*);
+    BatteryMode (*get_mode)(void*);
 } BATTERY_IMPLEMENTS;
 
 typedef struct {

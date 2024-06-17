@@ -20,27 +20,86 @@
 #define DBG_NAME "app"
 
 BUTTON* Button = NULL;
-BATTERY* Battery = NULL;
 
 SOCKETSERVER* SocketClient = NULL;
 
-// INTERCOM
-
 void LOCK_Handle(void* param) {
+    int lockRet = 0;
     char* massgeQ = NULL;
     LOCK* Lock = LOCK_CTOR();
+    lock = (LOCK_IMPLEMENTS*)Lock;
     Lock->init(Lock);
-    LOCK_IMPLEMENTS* lock = (LOCK_IMPLEMENTS*)Lock;
 
     lock_queue = osMessageQueueNew(4, sizeof(void*), NULL);
     while (1) {
         osMessageQueueGet(lock_queue, &massgeQ, 0, osWaitForever);
         switch (massgeQ[0]) {
             case 0x01:
-                lock->open(lock);
+                lockRet = lock->open(lock);
+                if (lockRet == 0) {
+                    DBG_I("Open successed\r\n");
+                    my_ringtone_play(MP3_OPENLOCK_PATH);
+                } else {
+                    DBG_I("Open failed\r\n");
+                    my_ringtone_play(MP3_OPEN_FAILED_PATH);
+                }
+
+
+                {
+                    Lock_Msg lockMsg = lock->get_load(lock);
+
+                    cJSON* root = cJSON_CreateObject();
+
+                    cJSON_AddStringToObject(root, "deviceId", "n001");
+                    cJSON_AddStringToObject(root, "requestId", "wechat");
+                    cJSON_AddBoolToObject(root, "deviceType", 0);
+
+                    cJSON* info = cJSON_CreateObject();
+                    cJSON_AddStringToObject(info, "lockOpt", "open");
+                    cJSON_AddStringToObject(info, "lockMode", lockMsg.mode);
+                    cJSON_AddStringToObject(info, "lockParam", lockMsg.param);
+
+                    cJSON_AddItemToObject(root, "deviceInfo", info);
+
+                    void* msg = cm_malloc(sizeof(64));
+                    msg = (void*)cJSON_PrintUnformatted(root);
+
+                    osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+                    cJSON_Delete(root);
+                }
                 break;
             case 0x02:
-                lock->close1(lock);
+                lockRet = lock->close1(lock);
+                if (lockRet == 0) {
+                    DBG_I("Close successed\r\n");
+                    my_ringtone_play(MP3_CLOSELOCK_PATH);
+                } else {
+                    DBG_I("Close failed\r\n");
+                    my_ringtone_play(MP3_CLOSE_FAILED_PATH);
+                }
+                {
+                    Lock_Msg lockMsg = lock->get_load(lock);
+                    cJSON* root = cJSON_CreateObject();
+
+                    cJSON_AddStringToObject(root, "deviceId", "n001");
+                    cJSON_AddStringToObject(root, "requestId", "wechat");
+                    cJSON_AddBoolToObject(root, "deviceType", 0);
+
+                    cJSON* info = cJSON_CreateObject();
+                    cJSON_AddStringToObject(info, "lockOpt", "close");
+                    cJSON_AddStringToObject(info, "lockMode", lockMsg.mode);
+                    cJSON_AddStringToObject(info, "lockParam", lockMsg.param);
+
+                    cJSON_AddItemToObject(root, "deviceInfo", info);
+
+                    void* msg = cm_malloc(sizeof(64));
+                    msg = (void*)cJSON_PrintUnformatted(root);
+
+                    osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+                    cJSON_Delete(root);
+                }
                 break;
             default:
                 break;
@@ -70,22 +129,43 @@ void FP_RECV_Handle(void* param) {
 
 void RTC_Count_Task(void* argument) {
     int rtcCount = 0;
-    Battery = BATTERY_CTOR();
-    BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;
     batteryCtrl->init(Battery);
-
+    int lockTime = 0;
     while (1) {
         ++rtcCount;
-        //        for (int i = 0; i < 4; i++) {
-        //            /* 充电时可以高速检测 */
-        //            osDelayMs(200);
-        //            Battery->interface.update_level(Battery);
-        //        }
+//        for (int i = 0; i < 4; i++) {
+//            /* 充电时可以高速检测 */
+//            osDelayMs(200);
+//
+//        }
         osDelayMs(1000);
 
         fp->tick_count(fp);
-
-        // DBG_I("Bat %d\r\n", Battery->interface.get_level(Battery));
+        batteryCtrl->update_level(batteryCtrl);
+        DBG_I("Bat %d %d\r\n", batteryCtrl->get_level(batteryCtrl), batteryCtrl->get_mode(batteryCtrl));
+//        DBG_I("%d %d %d [%d]\r\n", my_io_get(HALL1_GPIO_NUM), my_io_get(HALL2_GPIO_NUM), my_io_get(HALL3_GPIO_NUM), lock->get_state(lock));
+        if (lock->get_state(lock) == LOCK_STATE_OPEN && lockTime <= 10) {
+//            DBG_I("%d %d %d %d\r\n", my_io_get(HALL1_GPIO_NUM), my_io_get(HALL2_GPIO_NUM), my_io_get(HALL3_GPIO_NUM), lock->get_state(lock));
+            ++ lockTime;
+        } else if (lock->get_state(lock) == LOCK_STATE_CLOSE) {
+            lockTime = 0;
+        } else if(lockTime > 10) {
+            DBG_I("Time out\r\n");
+            if (!my_io_get(HALL3_GPIO_NUM)) {
+                lockTime = 0;
+//                my_ringtone_play(MP3_CLOSELOCK_PATH);
+                lock->load(lock, NULL, NULL, NULL);
+                lock->load(lock, NULL, "auto", NULL);
+                DBG_I("Atuo close door\r\n");
+//                lock->close1(lock);
+                void* msg = cm_malloc(1);
+                ((uint8_t*)msg)[0] = 0x02;  // 对应通道宏定义
+                osMessageQueuePut(lock_queue, &msg, 0, 0);
+            }
+        }
+        //        if (lock->get_state(lock) == LOCK_STATE_OPEN && my_io_get(HALL3_GPIO_NUM)) {
+//
+//        }
     }
 }
 
@@ -96,36 +176,59 @@ void my_button_callback(void) {
 }
 
 void Button_Click_Thread(void* param) {
+    bool bellButtonState = 0;
     void* massgeQ = NULL;
     osStatus_t ret = osStatusReserved;
-    int checkRet = BUTTON_RELEASED;
-    ButtonInfo info = {.num = BUTTON_NUM,
-                       .pin = BUTTON_PIN,
-                       .mode = CM_GPIO_PULL_UP,
-                       .direction = CM_GPIO_DIRECTION_INPUT,
-                       .irq = CM_GPIO_IT_EDGE_RISING,
-                       .call_back = my_button_callback};
-
-    Button = BUTTON_CTOR();
-    Button->init(Button, info);
-    BUTTON_IMPLEMENTS* buttonCtrl = (BUTTON_IMPLEMENTS*)Button;
-
+    my_bell_gpio_init();
+//    int checkRet = BUTTON_RELEASED;
+//    ButtonInfo info = {.num = BELL_GPIO_NUM,
+//                       .pin = BELL_GPIO_PIN,
+//                       .mode = CM_GPIO_PULL_UP,
+//                       .direction = CM_GPIO_DIRECTION_INPUT,
+//                       .irq = CM_GPIO_IT_EDGE_RISING,
+//                       .call_back = my_button_callback};
+//
+//    Button = BUTTON_CTOR();
+//    Button->init(Button, info);
+//    BUTTON_IMPLEMENTS* buttonCtrl = (BUTTON_IMPLEMENTS*)Button;
+//
     button_click_queue = osMessageQueueNew(4, sizeof(void*), NULL);
 
     while (1) {
         ret = osMessageQueueGet(button_click_queue, &massgeQ, 0, 100);
+
         switch (ret) {
             case osOK:
-                buttonCtrl->pressed(Button);
+//                buttonCtrl->pressed(Button);
+//                DBG_I("Start BELL BUTTON\r\n");
+                bellButtonState = 1;
                 cm_free(massgeQ);
                 break;
             case osError:
-                checkRet = buttonCtrl->check(Button);
-                if (checkRet != BUTTON_RELEASED) {
-                    void* msg = cm_malloc(1);
-                    ((uint8_t*)msg)[0] = checkRet;
-                    osMessageQueuePut(transceiver_queue, &msg, 0, 0);
+                if (bellButtonState && my_bell_level_get() == CM_GPIO_LEVEL_LOW) {
+                    bellButtonState = 0;
+//                    DBG_E("End BELL BUTTON\r\n");
+                    my_ringtone_play(MP3_CALLSTART_PATH);
+                        cJSON* root = cJSON_CreateObject();
+
+                        cJSON_AddStringToObject(root, "deviceId", "n001");
+                        cJSON_AddStringToObject(root, "requestId", "wechat");
+                        cJSON_AddBoolToObject(root, "deviceType", 0);
+                        cJSON_AddStringToObject(root, "doorBell", "on");
+
+                        void* msg = cm_malloc(sizeof(64));
+                        msg = (void*)cJSON_PrintUnformatted(root);
+
+                        osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+                        cJSON_Delete(root);
+                } else if(bellButtonState){
+                    bellButtonState = 0;
                 }
+//                checkRet = buttonCtrl->check(Button);
+//                if (checkRet != BUTTON_RELEASED) {
+//                    DBG_W("Button %d\r\n", checkRet);
+//                }
                 break;
             default:
                 break;
@@ -191,13 +294,18 @@ void MQTT_RECV_Handle(void* param) {
             if (cjson_item) {
                 if (strcmp(cjson_item->valuestring, "open") == 0) {
                     DBG_F("Open door\r\n");
-                    my_ringtone_play(MP3_OPENLOCK_PATH);
+//                    my_ringtone_play(MP3_OPENLOCK_PATH);
+                    lock->load(lock, NULL, NULL, NULL);
+                    lock->load(lock, NULL, "weixin", NULL);
                     void* msg = cm_malloc(1);
                     ((uint8_t*)msg)[0] = 0x01;  // 对应通道宏定义
                     osMessageQueuePut(lock_queue, &msg, 0, 0);
+                    fp->clear_abnormal(fp);
                 } else if (strcmp(cjson_item->valuestring, "close") == 0) {
                     DBG_F("Close door\r\n");
-                    my_ringtone_play(MP3_CLOSELOCK_PATH);
+//                    my_ringtone_play(MP3_CLOSELOCK_PATH);
+                    lock->load(lock, NULL, NULL, NULL);
+                    lock->load(lock, NULL, "weixin", NULL);
                     void* msg = cm_malloc(1);
                     ((uint8_t*)msg)[0] = 0x02;  // 对应通道宏定义
                     osMessageQueuePut(lock_queue, &msg, 0, 0);
@@ -224,25 +332,30 @@ void MQTT_RECV_Handle(void* param) {
 
         cjson_request = cJSON_GetObjectItem(cjson_whole, "request");
         if (cjson_request) {
-//            cjson_item = cJSON_GetObjectItem(cjson_commend, "info");
             DBG_W("request: %s\r\n", cjson_request->valuestring);
-            cJSON* root = cJSON_CreateObject();
 
-            cJSON_AddStringToObject(root, "deviceId", "n001");
-            cJSON_AddStringToObject(root, "requestId", "wechat");
-            cJSON_AddBoolToObject(root, "deviceType", 0);
+            if (strcmp(cjson_request->valuestring, "info") == 0) {
+                cJSON* root = cJSON_CreateObject();
 
-            cJSON* info = cJSON_CreateObject();
-            cJSON_AddStringToObject(info, "imei", Transceiver->cfg.imei);
+                cJSON_AddStringToObject(root, "deviceId", "n001");
+                cJSON_AddStringToObject(root, "requestId", "wechat");
+                cJSON_AddBoolToObject(root, "deviceType", 0);
 
-            cJSON_AddItemToObject(root, "deviceInfo", info);
+                cJSON* info = cJSON_CreateObject();
+                cJSON_AddStringToObject(info, "imei", Transceiver->cfg.imei);
+                cJSON_AddNumberToObject(info, "level", batteryCtrl->get_level(batteryCtrl));
+                cJSON_AddNumberToObject(info, "batMode", batteryCtrl->get_mode(batteryCtrl));
+                cJSON_AddNumberToObject(info, "lockState", lock->get_state(lock));
 
-            void* msg = cm_malloc(sizeof(15));
-            msg = (void*)cJSON_PrintUnformatted(root);
+                cJSON_AddItemToObject(root, "deviceInfo", info);
 
-            osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+                void* msg = cm_malloc(sizeof(64));
+                msg = (void*)cJSON_PrintUnformatted(root);
 
-            cJSON_Delete(root);
+                osMessageQueuePut(mqtt_send_queue, &msg, 0, 0);
+
+                cJSON_Delete(root);
+            }
         }
 
         cJSON_Delete(cjson_whole);
@@ -268,20 +381,19 @@ void MQTT_Client_Thread(void* param) {
         .targt.imei = "2234567890",
         .player_cb = my_player_cb,
         .record_cb = my_record_cb,
-        .volume = 100,
+        .volume =100,
         .gain = 0,
     };
 
+    Transceiver = TRANSCEIVER_CTOR();
     Transceiver->init(Transceiver, cfg);
+    phone = (TRANSCEIVER_IMPLEMENTS*)Transceiver;
     my_audio_io_sw(1);
     phone->online(Transceiver);
     /* 设置指纹密码 */
     //    strncpy(Fingerprint->info.pwd, Transceiver->cfg.imei, 4);
 
     transceiver_queue = osMessageQueueNew(4, sizeof(void*), NULL);
-    Battery = BATTERY_CTOR();
-    BATTERY_IMPLEMENTS* batteryCtrl = (BATTERY_IMPLEMENTS*)Battery;
-    batteryCtrl->init(Battery);
 
     my_network_io_init();
 

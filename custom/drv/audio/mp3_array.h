@@ -27,4 +27,10 @@ extern const unsigned char closelock_mp3[1224];
 #define MP3_VFY_ERR_PATH "vfy_err.mp3"
 extern const unsigned char vfy_err_mp3[1872];
 
+#define MP3_CLOSE_FAILED_PATH "close_failed.mp3"
+extern const unsigned char close_failed_mp3[1800];
+
+#define MP3_OPEN_FAILED_PATH "open_failed.mp3"
+extern const unsigned char open_failed_mp3[1872];
+
 void my_amr_load_files(void);

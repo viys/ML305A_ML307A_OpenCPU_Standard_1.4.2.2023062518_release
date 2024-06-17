@@ -53,5 +53,8 @@
 #define MOTOR_INT_ON       CM_GPIO_LEVEL_HIGH
 #define MOTOR_INT_OFF      CM_GPIO_LEVEL_LOW
 
+#define BELL_GPIO_NUM      CM_GPIO_NUM_13
+#define BELL_GPIO_PIN      CM_IOMUX_PIN_77
+
 /* ADC资源 */
 #define BATE_ADC           CM_ADC_0  //电池ADC

@@ -4,6 +4,7 @@
 #include "drv_uart.h"
 #include "includes.h"
 #include "sys.h"
+#include "app.h"
 
 #define DBG_NAME "lock"
 
@@ -18,6 +19,12 @@ void bdr_motor_init(void) {
                  CM_IOMUX_FUNC_FUNCTION2);
 }
 
+//static void hall3_irq_call_back(void) {
+//    void* msg = cm_malloc(1);
+//    ((uint8_t*)msg)[0] = 0x03;  // 对应通道宏定义
+//    osMessageQueuePut(lock_queue, &msg, 0, 0);
+//}
+
 void bdr_hall_init(void) {
     cm_gpio_cfg_t cfg = {.direction = CM_GPIO_DIRECTION_INPUT,
                          .pull = CM_GPIO_PULL_DOWN};
@@ -25,11 +32,15 @@ void bdr_hall_init(void) {
     my_io_init_2(HALL1_GPIO_NUM, HALL1_GPIO_PIN, cfg, CM_IOMUX_FUNC_FUNCTION2);
     my_io_init_2(HALL2_GPIO_NUM, HALL2_GPIO_PIN, cfg, CM_IOMUX_FUNC_FUNCTION2);
     my_io_init_2(HALL3_GPIO_NUM, HALL3_GPIO_PIN, cfg, CM_IOMUX_FUNC_FUNCTION2);
+//    cm_gpio_interrupt_register(HALL3_GPIO_NUM, hall3_irq_call_back);
+//    cm_gpio_interrupt_enable(HALL3_GPIO_NUM, CM_GPIO_IT_EDGE_RISING);
 
     cfg.direction = CM_GPIO_DIRECTION_OUTPUT;
     cfg.pull = CM_GPIO_PULL_UP;
     my_io_init_2(HALL_EN_GPIO_NUM, HALL_EN_GPIO_PIN, cfg,
                  CM_IOMUX_FUNC_FUNCTION2);
+
+    my_io_sw(HALL_EN_GPIO_NUM, 0);
 }
 
 static Hall_State bdr_hall_get_state(void) {
@@ -49,7 +60,7 @@ static Hall_State bdr_hall_get_state(void) {
     } else if (HALL_OFF == hall1 && HALL_OFF == hall2) {
         state = LOCK_MID;
     } else {
-        DBG_I("Hall 1[%d] 2[%d] 3[%d]\r\n", hall1, hall2, hall3);
+//        DBG_I("Hall 1[%d] 2[%d] 3[%d]\r\n", hall1, hall2, hall3);
         state = LOCK_MID;
     }
 
@@ -94,12 +105,33 @@ void lock_init() {
     DBG_F("lock init\r\n");
 }
 
+static LOCK_STATE lock_get_state(void* t) {
+    LOCK_STATE state = LOCK_STATE_OPEN;
+
+    switch (bdr_hall_get_state()) {
+    case LOCK_OPEN:
+        state = LOCK_STATE_OPEN;
+        break;
+    case LOCK_CLOSE:
+        state = LOCK_STATE_CLOSE;
+        break;
+    case LOCK_MID:
+        state = LOCK_STATE_OPEN;
+        break;
+    }
+
+    return state;
+}
+
+
+
 #define MOTOR_OPT
 
 static int lock_open(void* t) {
+    LOCK* this = (LOCK*)t;
     Hall_State state;
     int time = 0;
-    my_io_sw(HALL_EN_GPIO_NUM, 0);
+//    my_io_sw(HALL_EN_GPIO_NUM, 0);
     osDelayMs(200);
     state = bdr_hall_get_state();
 
@@ -121,15 +153,23 @@ static int lock_open(void* t) {
     } else {
         DBG_I("Lock is open, no need to open\r\n");
     }
-    my_io_sw(HALL_EN_GPIO_NUM, 1);
-
-    return 0;
+//    my_io_sw(HALL_EN_GPIO_NUM, 1);
+    if (time >= 250) {
+        memcpy(this->msg.opt, "open", strlen("open"));
+        memcpy(this->msg.param, "false", strlen("false"));
+        return -1;
+    } else {
+        memcpy(this->msg.opt, "open", strlen("open"));
+        memcpy(this->msg.param, "true", strlen("true"));
+        return 0;
+    }
 }
 
 static int lock_close(void* t) {
+    LOCK* this = (LOCK*)t;
     Hall_State state;
     int time = 0;
-    my_io_sw(HALL_EN_GPIO_NUM, 0);
+//    my_io_sw(HALL_EN_GPIO_NUM, 0);
     osDelayMs(200);
     state = bdr_hall_get_state();
 
@@ -151,9 +191,46 @@ static int lock_close(void* t) {
     } else {
         DBG_I("Lock is close, no need to close\r\n");
     }
-    my_io_sw(HALL_EN_GPIO_NUM, 1);
+//    my_io_sw(HALL_EN_GPIO_NUM, 1);
 
-    return 0;
+    if (time >= 250) {
+        memcpy(this->msg.opt, "close", strlen("close"));
+        memcpy(this->msg.param, "false", strlen("false"));
+        return -1;
+    } else {
+        memcpy(this->msg.opt, "close", strlen("close"));
+        memcpy(this->msg.param, "true", strlen("true"));
+        return 0;
+    }
+
+}
+
+void lock_load(void* t, char* opt, char* mode, char* param) {
+    LOCK* this = (LOCK*)t;
+
+    if (opt != NULL) {
+        memcpy(this->msg.opt, opt, strlen(opt));
+    }
+
+    if (param != NULL) {
+        memcpy(this->msg.param, param, strlen(param));
+    }
+
+    if (mode != NULL) {
+        memcpy(this->msg.mode, mode, strlen(mode));
+    }
+
+    if(opt == NULL && mode == NULL && param == NULL) {
+        memset(this->msg.opt, 0x00, sizeof(this->msg.opt));
+        memset(this->msg.mode, 0x00, sizeof(this->msg.mode));
+        memset(this->msg.param, 0x00, sizeof(this->msg.param));
+    }
+}
+
+Lock_Msg lock_get_load(void* t) {
+    LOCK* this = (LOCK*)t;
+//    DBG_E("Opt:%s, mode:%s, param:%s\r\n", this->msg.opt, this->msg.mode, this->msg.param);
+    return this->msg;
 }
 
 LOCK* LOCK_CTOR(void) {
@@ -162,6 +239,9 @@ LOCK* LOCK_CTOR(void) {
     this->init = lock_init;
     this->api.open = lock_open;
     this->api.close1 = lock_close;
+    this->api.get_state = lock_get_state;
+    this->api.load = lock_load;
+    this->api.get_load = lock_get_load;
 
     return this;
 }
